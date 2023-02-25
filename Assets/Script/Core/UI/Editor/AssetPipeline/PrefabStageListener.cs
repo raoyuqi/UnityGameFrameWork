@@ -1,4 +1,6 @@
-﻿using UnityEditor;
+﻿using FrameWork.Core.UI;
+using System.Collections.Generic;
+using UnityEditor;
 using UnityEditor.Experimental.SceneManagement;
 using UnityEngine;
 
@@ -10,8 +12,17 @@ public class PrefabStageListener
     [InitializeOnLoadMethod]
     static void StartInitializeOnLoadMethod()
     {
+        PrefabStage.prefabSaving += OnPrefabSaving;
         PrefabStage.prefabSaved += OnPrefabSaved;
         PrefabUtility.prefabInstanceUpdated += OnPrefabInstanceUpdated;
+    }
+
+    public static void OnPrefabSaving(GameObject gameObject)
+    {
+        Debug.Log($"预制体保存中：, { gameObject.name }");
+        var gameObjectList = BindGameObjectTools.GetBindingGameObjectList(gameObject);
+        var UIPanel = gameObject.GetComponent<UIPanelBase>();
+        UIPanel.BindingGameObjectList(gameObjectList);
     }
 
     public static void OnPrefabSaved(GameObject gameObject)

@@ -1,9 +1,9 @@
-﻿using FrameWork.Core.Attributes;
+﻿using Core.Attributes;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace FrameWork.Core.UI
+namespace Core.UI
 {
     public enum UIShowType
     {
@@ -61,11 +61,6 @@ namespace FrameWork.Core.UI
 
         public virtual void OnOpen() { }
         #endregion
-
-        public void BindingGameObjectList(List<GameObject> gameObjects)
-        {
-            this.m_ObjectList = gameObjects;
-        }
 
         public void AddEventListener()
         {

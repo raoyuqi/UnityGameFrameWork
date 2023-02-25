@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Core.Attributes
+namespace FrameWork.Core.Attributes
 {
     public class LabelTextAttribute : PropertyAttribute
     {
