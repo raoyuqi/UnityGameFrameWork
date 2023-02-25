@@ -24,6 +24,9 @@ public static class BindGameObjectTools
         "Txt_",
         "Text_",
 
+        //InputField
+        "Input_",
+
         // 图片
         "Img_",
         "Image_",
@@ -37,6 +40,9 @@ public static class BindGameObjectTools
 
         // list
         "List_",
+
+        // Slider
+        "Slider_",
 
         // 组，用来控制显隐
         "Group_"

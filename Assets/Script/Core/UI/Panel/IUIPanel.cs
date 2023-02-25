@@ -15,6 +15,6 @@
         void OnHide();
 
         //关闭(销毁)时调用
-        void OnClose();
+        void Dispose();
     }
 }
