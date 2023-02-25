@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 
 
-namespace FrameWork.Core.Attributes
+namespace Core.Attributes
 {
     public class ReadOnlyAttribute : PropertyAttribute
     {

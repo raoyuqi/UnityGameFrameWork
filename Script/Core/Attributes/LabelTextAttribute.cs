@@ -1,13 +1,13 @@
 ﻿using UnityEngine;
 
-namespace FrameWork.Core.Attributes
+namespace Core.Attributes
 {
-    public class LabelEnumAttribute : PropertyAttribute
+    public class LabelTextAttribute : PropertyAttribute
     {
         private string m_Name;
         public string Name { get { return this.m_Name; } }
 
-        public LabelEnumAttribute(string name)
+        public LabelTextAttribute(string name)
         {
             this.m_Name = name;
         }
