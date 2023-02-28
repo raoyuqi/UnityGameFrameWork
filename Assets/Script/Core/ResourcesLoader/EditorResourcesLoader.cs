@@ -47,21 +47,5 @@ namespace FrameWork.Core.ResourcesLoader
 
             return assets;
         }
-
-        //public async Task<T> LoadAssetsAsync<T>(string path) where T : Object
-        //{
-        //    var th = Loom.RunAsync(() => this.LoadAssets<T>(path));
-        //    th.Start();
-        //    var assets = await Task.Run(() => this.LoadAssets<T>(path));
-        //    return assets;
-        //}
-
-        public IEnumerator LoadAssetsAsync<T>(string path, System.Action<T> callback) where T : Object
-        {
-            var assets = this.LoadAssets<T>(path);
-            if (callback != null)
-                callback(assets);
-            yield return new WaitForEndOfFrame();
-        }
     }
 }
