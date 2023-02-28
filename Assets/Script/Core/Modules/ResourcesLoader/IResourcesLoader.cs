@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace FrameWork.Core.ResourcesLoader
+namespace FrameWork.Core.Modules.ResourcesLoader
 {
     public interface IResourcesLoader
     {

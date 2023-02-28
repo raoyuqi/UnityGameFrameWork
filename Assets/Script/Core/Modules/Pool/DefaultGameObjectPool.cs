@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace FrameWork.Core.Manager
+namespace FrameWork.Core.Modules.Event
 {
     public class DefaultGameObjectPool : IGameObjectPool
     {

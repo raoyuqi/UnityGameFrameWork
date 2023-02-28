@@ -1,4 +1,4 @@
-﻿namespace FrameWork.Core.UI
+﻿namespace FrameWork.Core.Modules.UI
 {
     /// <summary>
     /// 面板的生命周期

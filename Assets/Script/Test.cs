@@ -1,4 +1,4 @@
-﻿using FrameWork.Core.ResourcesLoader;
+﻿using FrameWork.Core.Modules.ResourcesLoader;
 using UnityEngine;
 
 public class Test : MonoBehaviour

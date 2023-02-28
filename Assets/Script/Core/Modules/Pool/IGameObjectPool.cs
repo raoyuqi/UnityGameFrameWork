@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace FrameWork.Core.Manager
+namespace FrameWork.Core.Modules.Event
 {
     public interface IGameObjectPool
     {

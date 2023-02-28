@@ -1,5 +1,5 @@
 ﻿using FrameWork.Core.Mixin;
-using FrameWork.Core.UI;
+using FrameWork.Core.Modules.UI;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
