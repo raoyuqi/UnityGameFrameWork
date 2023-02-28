@@ -22,7 +22,8 @@ public class PrefabStageListener
         Debug.Log($"预制体保存中：, { gameObject.name }");
         var gameObjectList = BindGameObjectTools.GetBindingGameObjectList(gameObject);
         var UIPanel = gameObject.GetComponent<UIPanelBase>();
-        UIPanel.BindingGameObjectList(gameObjectList);
+        if (UIPanel != null)
+            UIPanel.BindingGameObjectList(gameObjectList);
     }
 
     public static void OnPrefabSaved(GameObject gameObject)
