@@ -67,7 +67,11 @@ public static class BindGameObjectTools
 
         var ret = new List<GameObject>();
         if (!gameObject.TryGetComponent(out UIPanelBase UIPanel))
-            throw new Exception($"请挂载脚本：UIPanel");
+        {
+            //throw new Exception($"请挂载脚本：UIPanel");
+            Debug.LogError("如果是Panel界面，请挂载脚本：UIPanel，否则忽略该消息！");
+            return ret;
+        }
 
         var transArray = gameObject.transform.GetComponentsInChildren<Transform>();
         foreach (Transform child in transArray)

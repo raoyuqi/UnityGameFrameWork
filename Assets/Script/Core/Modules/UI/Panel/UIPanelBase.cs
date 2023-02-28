@@ -30,7 +30,7 @@ namespace FrameWork.Core.Modules.UI
         [LabelEnum("普通层,显示最下面")]
         Normal   = 0,   // 普通层, 显示最下面
         [LabelEnum("常用弹窗显示层级")]
-        Function = 1,   // 常用弹窗显示层级
+        Popup = 1,   // 常用弹窗显示层级
         [LabelEnum("Tips显示层级")]
         Tips     = 3,   // Tips显示层级
         [LabelEnum("非Loading界面最高层级")]
@@ -56,6 +56,10 @@ namespace FrameWork.Core.Modules.UI
 
         [SerializeField, LabelEnum("所属层级")]
         private UILayerType m_UILayerType;
+        public UILayerType UILayerType
+        {
+            get { return this.m_UILayerType; }
+        }
 
         // 缓存界面使用到的控件
         private Dictionary<string, Text> m_TextCache = new Dictionary<string, Text>();
