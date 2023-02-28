@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace FrameWork.Core.UI
+namespace FrameWork.Core.Modules.UI
 {
     public enum UIShowType
     {
