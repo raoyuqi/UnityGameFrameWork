@@ -47,5 +47,13 @@ namespace FrameWork.Core.Modules.ResourcesLoader
 
             return assets;
         }
+
+        public IEnumerator LoadAssetsAsync<T>(string path, System.Action<T> callback = null) where T : Object
+        {
+            yield return null;
+            var assets = this.LoadAssets<T>(path);
+            if (callback != null)
+                callback(assets);
+        }
     }
 }
