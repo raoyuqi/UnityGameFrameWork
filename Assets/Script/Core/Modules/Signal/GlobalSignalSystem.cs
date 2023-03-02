@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FrameWork.Core.Mixin;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -6,12 +7,12 @@ namespace FrameWork.Core.Modules.Signal
 {
     public delegate void GlobalSignalHandle(params object[] args);
 
-    public sealed class GlobalSignalSystem
+    public sealed class GlobalSignalSystem : SingletonBase<GlobalSignalSystem>
     {
         private Dictionary<Enum, GlobalSignalHandle> m_GlobalSignalsByEnum = new Dictionary<Enum, GlobalSignalHandle>();
         private Dictionary<string, GlobalSignalHandle> m_GlobalSignalsByString = new Dictionary<string, GlobalSignalHandle>();
 
-        public void RaisedSignal(UISignal signal, params object[] args)
+        public void RaiseSignal(UISignal signal, params object[] args)
         {
             if (!this.m_GlobalSignalsByEnum.ContainsKey(signal))
             {
@@ -20,15 +21,28 @@ namespace FrameWork.Core.Modules.Signal
                 return;
             }
 
-            this.m_GlobalSignalsByEnum[signal]?.Invoke(args);
+            var index = 0;
+            foreach (GlobalSignalHandle handle in this.m_GlobalSignalsByEnum[signal].GetInvocationList())
+            {
+                index++;
+                try
+                {
+                    handle.Invoke(args);
+                }
+                catch (Exception ex)
+                {
+
+                    Debug.LogError($"RaiseGlobalSignal Exception : {ex.Message}, signal = {Enum.GetName(typeof(UISignal), signal)}, index = {index}");
+                }
+            }
         }
 
-        public void RegisterSignal(Enum signal, GlobalSignalHandle callBack)
+        public void RegisterSignal(Enum signal, GlobalSignalHandle handle)
         {
             if (this.m_GlobalSignalsByEnum.ContainsKey(signal))
-                this.m_GlobalSignalsByEnum[signal] += callBack;
+                this.m_GlobalSignalsByEnum[signal] += handle;
             else
-                this.m_GlobalSignalsByEnum.Add(signal, callBack);
+                this.m_GlobalSignalsByEnum.Add(signal, handle);
         }
 
         public void RemoveAllSignal(Enum signal)
@@ -44,7 +58,7 @@ namespace FrameWork.Core.Modules.Signal
             this.m_GlobalSignalsByEnum.Remove(signal);
         }
 
-        public void RemoveSignal(Enum signal, GlobalSignalHandle callBack)
+        public void RemoveSignal(Enum signal, GlobalSignalHandle handle)
         {
             if (!this.m_GlobalSignalsByEnum.ContainsKey(signal))
             {
@@ -54,12 +68,12 @@ namespace FrameWork.Core.Modules.Signal
             }
 
             if (this.m_GlobalSignalsByEnum[signal] != null)
-                this.m_GlobalSignalsByEnum[signal] -= callBack;
+                this.m_GlobalSignalsByEnum[signal] -= handle;
             else
                 this.m_GlobalSignalsByEnum.Remove(signal);
         }
 
-        public void RaisedSignal(string signal, params object[] args)
+        public void RaiseSignal(string signal, params object[] args)
         {
             if (!this.m_GlobalSignalsByString.ContainsKey(signal))
             {
@@ -67,15 +81,28 @@ namespace FrameWork.Core.Modules.Signal
                 return;
             }
 
-            this.m_GlobalSignalsByString[signal]?.Invoke(args);
+            var index = 0;
+            foreach (GlobalSignalHandle handle in this.m_GlobalSignalsByString[signal].GetInvocationList())
+            {
+                index++;
+                try
+                {
+                    handle.Invoke(args);
+                }
+                catch (Exception ex)
+                {
+
+                    Debug.LogError($"RaiseGlobalSignal Exception : {ex.Message}, signal = {signal}, index = {index}");
+                }
+            }
         }
 
-        public void RegisterSignal(string signal, GlobalSignalHandle callBack)
+        public void RegisterSignal(string signal, GlobalSignalHandle handle)
         {
             if (this.m_GlobalSignalsByString.ContainsKey(signal))
-                this.m_GlobalSignalsByString[signal] += callBack;
+                this.m_GlobalSignalsByString[signal] += handle;
             else
-                this.m_GlobalSignalsByString.Add(signal, callBack);
+                this.m_GlobalSignalsByString.Add(signal, handle);
         }
 
         public void RemoveAllSignal(string signal)
@@ -90,7 +117,7 @@ namespace FrameWork.Core.Modules.Signal
             this.m_GlobalSignalsByString.Remove(signal);
         }
 
-        public void RemoveSignal(string signal, GlobalSignalHandle callBack)
+        public void RemoveSignal(string signal, GlobalSignalHandle handle)
         {
             if (!this.m_GlobalSignalsByString.ContainsKey(signal))
             {
@@ -99,7 +126,7 @@ namespace FrameWork.Core.Modules.Signal
             }
 
             if (this.m_GlobalSignalsByString[signal] != null)
-                this.m_GlobalSignalsByString[signal] -= callBack;
+                this.m_GlobalSignalsByString[signal] -= handle;
             else
                 this.m_GlobalSignalsByString.Remove(signal);
         }
