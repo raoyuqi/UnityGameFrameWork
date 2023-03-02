@@ -6,14 +6,14 @@
     /// <typeparam name="T"></typeparam>
     public abstract class SingletonBase<T> where T : class, new()
     {
-        private readonly object s_LockObj = new object();
+        private readonly static object s_LockObj = new object();
 
-        private T s_Instance;
-        public T Instance
+        private static T s_Instance;
+        public static T Instance
         {
             get
             {
-                if (this.s_Instance == null)
+                if (s_Instance == null)
                 {
                     lock (s_LockObj)
                     {
