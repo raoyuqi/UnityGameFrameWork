@@ -27,7 +27,8 @@ namespace FrameWork.Core.Modules.Signal
             if (!this.m_UISignals.ContainsKey(signal))
             {
                 var signalName = Enum.GetName(typeof(UISignal), signal);
-                Debug.LogError($"信号未注册:{ signalName }");
+                Debug.LogError($"UI信号未注册:{ signalName }");
+                return;
             }
 
             this.m_UISignals[signal]?.Invoke(UIPanel, args);
@@ -46,7 +47,8 @@ namespace FrameWork.Core.Modules.Signal
             if (!this.m_UISignals.ContainsKey(signal))
             {
                 var signalName = Enum.GetName(typeof(UISignal), signal);
-                Debug.LogError($"信号未注册:{ signalName }");
+                Debug.LogError($"UI信号未注册:{ signalName }");
+                return;
             }
 
             this.m_UISignals[signal] = null;
@@ -58,7 +60,8 @@ namespace FrameWork.Core.Modules.Signal
             if (!this.m_UISignals.ContainsKey(signal))
             {
                 var signalName = Enum.GetName(typeof(UISignal), signal);
-                Debug.LogError($"信号未注册:{ signalName }");
+                Debug.LogError($"UI信号未注册:{ signalName }");
+                return;
             }
 
             if (this.m_UISignals[signal] != null)
@@ -67,7 +70,4 @@ namespace FrameWork.Core.Modules.Signal
                 this.m_UISignals.Remove(signal);
         }
     }
-
-    // 传参基类，TODO：转移到全局事件系统
-    public class SignalArgs { }
 }
