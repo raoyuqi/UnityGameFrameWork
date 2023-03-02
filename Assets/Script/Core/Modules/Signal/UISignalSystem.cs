@@ -1,6 +1,5 @@
 ﻿using FrameWork.Core.Modules.UI;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -17,28 +16,55 @@ namespace FrameWork.Core.Modules.Signal
         OnDestroy = 7
     }
 
-    public delegate void UICallBack(UIPanelBase panel, params object[] args);
+    public delegate void UISignalCallBack(UIPanelBase panel, params object[] args);
 
     public sealed class UISignalSystem
     {
-        public void RaisedSignal()
+        private Dictionary<UISignal, UISignalCallBack> m_UISignals = new Dictionary<UISignal, UISignalCallBack>();
+
+        public void RaisedSignal(UISignal signal, UIPanelBase UIPanel, params object[] args)
         {
-            throw new NotImplementedException();
+            if (!this.m_UISignals.ContainsKey(signal))
+            {
+                var signalName = Enum.GetName(typeof(UISignal), signal);
+                Debug.LogError($"信号未注册:{ signalName }");
+            }
+
+            this.m_UISignals[signal]?.Invoke(UIPanel, args);
         }
 
-        public void RegisterSignal(UISignal name, UICallBack callBack)
+        public void RegisterSignal(UISignal signal, UISignalCallBack callBack)
         {
-            throw new NotImplementedException();
+            if (this.m_UISignals.ContainsKey(signal))
+                this.m_UISignals[signal] += callBack;
+            else
+                this.m_UISignals.Add(signal, callBack);
         }
 
-        public void RemoveAllSignal(UISignal name)
+        public void RemoveAllSignal(UISignal signal)
         {
-            throw new NotImplementedException();
+            if (!this.m_UISignals.ContainsKey(signal))
+            {
+                var signalName = Enum.GetName(typeof(UISignal), signal);
+                Debug.LogError($"信号未注册:{ signalName }");
+            }
+
+            this.m_UISignals[signal] = null;
+            this.m_UISignals.Remove(signal);
         }
 
-        public void RemoveSignal(UISignal name, UICallBack callBack)
+        public void RemoveSignal(UISignal signal, UISignalCallBack callBack)
         {
-            throw new NotImplementedException();
+            if (!this.m_UISignals.ContainsKey(signal))
+            {
+                var signalName = Enum.GetName(typeof(UISignal), signal);
+                Debug.LogError($"信号未注册:{ signalName }");
+            }
+
+            if (this.m_UISignals[signal] != null)
+                this.m_UISignals[signal] -= callBack;
+            else
+                this.m_UISignals.Remove(signal);
         }
     }
 
