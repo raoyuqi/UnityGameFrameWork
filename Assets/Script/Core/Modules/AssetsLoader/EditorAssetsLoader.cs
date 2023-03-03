@@ -3,10 +3,10 @@ using System.IO;
 using UnityEditor;
 using UnityEngine;
 
-namespace FrameWork.Core.Modules.ResourcesLoader
+namespace FrameWork.Core.Modules.AssetsLoader
 {
     // TODO: 更新引用计数
-    public sealed class EditorResourcesLoader : IResourcesLoader
+    public sealed class EditorAssetsLoader : IAssetsLoader
     {
         private readonly string r_AssetsPathRoot = "Assets/AssetsPackage/";
 

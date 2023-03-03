@@ -1,8 +1,8 @@
 ﻿using UnityEngine;
 
-namespace FrameWork.Core.Modules.ResourcesLoader
+namespace FrameWork.Core.Modules.AssetsLoader
 {
-    public interface IResourcesLoader
+    public interface IAssetsLoader
     {
         Object LoadAssets(string path);
 
