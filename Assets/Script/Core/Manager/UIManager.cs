@@ -17,6 +17,8 @@ namespace FrameWork.Core.Manager
         // TODO: LRU存储
         private Stack<IUIPanel> m_AllShowUIPanelStacks = new Stack<IUIPanel>();
 
+        //private 
+
         public UIManager()
         {
 

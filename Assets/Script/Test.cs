@@ -1,4 +1,5 @@
-﻿using FrameWork.Core.Modules.AssetsLoader;
+﻿using FrameWork.Core.Manager;
+using FrameWork.Core.Modules.AssetsLoader;
 using FrameWork.Core.Modules.Signal;
 using FrameWork.Core.Modules.UI;
 using System.Collections;
@@ -9,8 +10,7 @@ public class Test : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        var resourcesLoader = new EditorAssetsLoader();
-        var prefab = resourcesLoader.LoadAssets<GameObject>("UI/Prefabs/Login/LoginPanel.prefab");
+        var prefab = AssetsLoaderManager.Instance.LoadAssets<GameObject>("UI/Prefabs/Login/LoginPanel.prefab");
         Debug.Log(prefab.name);
         var go = GameObject.Instantiate(prefab, this.gameObject.transform);
         Debug.Log(go.name + go.GetInstanceID());
