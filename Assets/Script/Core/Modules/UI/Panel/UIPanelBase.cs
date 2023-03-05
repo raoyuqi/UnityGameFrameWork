@@ -53,6 +53,10 @@ namespace FrameWork.Core.Modules.UI
 
         [SerializeField, LabelEnum("展示类型")]
         private UIShowType m_UIShowType;
+        public UIShowType UIShowType
+        {
+            get { return this.m_UIShowType; }
+        }
 
         [SerializeField, LabelEnum("所属层级")]
         private UILayerType m_UILayerType;
@@ -60,6 +64,8 @@ namespace FrameWork.Core.Modules.UI
         {
             get { return this.m_UILayerType; }
         }
+
+        private List<UIPanelBase> m_PopupList = new List<UIPanelBase>(); 
 
         // 缓存界面使用到的控件
         private Dictionary<string, Text> m_TextCache = new Dictionary<string, Text>();
