@@ -1,5 +1,6 @@
 ﻿using FrameWork.Core.Mixin;
 using FrameWork.Core.Modules.AssetsLoader;
+using System.Collections;
 using UnityEngine;
 
 namespace FrameWork.Core.Manager
@@ -32,7 +33,7 @@ namespace FrameWork.Core.Manager
 
         public void LoadAssetsAsync<T>(string path, System.Action<T> callback = null) where T : Object
         {
-            this.AssetsLoader.LoadAssetsAsync<T>(path, callback);
+            MonoBehaviourRuntime.Instance.StartCoroutine(this.AssetsLoader.LoadAssetsAsync<T>(path, callback));
         }
     }
 }

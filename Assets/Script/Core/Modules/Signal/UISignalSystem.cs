@@ -8,13 +8,14 @@ namespace FrameWork.Core.Modules.Signal
 {
     public enum UISignal
     {
-        OnOpened = 1,
-        OnClosed = 2,
-        OnHide = 3,
-        OnShow = 4,
-        OnInit = 5,
-        OnRefresh = 6,
-        OnDestroy = 7
+        OnOpen = 1,
+        OnOpened = 2,
+        OnClosed = 3,
+        OnHide = 4,
+        OnShow = 5,
+        initialized = 6,
+        OnRefresh = 7,
+        OnDestroy = 8
     }
 
     public delegate void UISignalHandle(UIPanelBase panel, params object[] args);

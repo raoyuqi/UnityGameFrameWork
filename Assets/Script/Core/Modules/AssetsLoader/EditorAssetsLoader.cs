@@ -7,7 +7,7 @@ namespace FrameWork.Core.Modules.AssetsLoader
 {
     public sealed class EditorAssetsLoader : IAssetsLoader
     {
-        private readonly string r_AssetsPathRoot = "Assets/AssetsPackage/";
+        private const string r_AssetsPathRoot = "Assets/AssetsPackage/";
 
         public Object LoadAssets(string path)
         {

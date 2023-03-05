@@ -167,7 +167,7 @@ GameObject:
   - component: {fileID: 3728913705704405099}
   - component: {fileID: 5453658571198814379}
   - component: {fileID: 3132714136700263436}
-  - component: {fileID: 98713219785827657}
+  - component: {fileID: 1487178084652365207}
   m_Layer: 5
   m_Name: LoginPanel
   m_TagString: Untagged
@@ -234,7 +234,7 @@ MonoBehaviour:
   m_BlockingMask:
     serializedVersion: 2
     m_Bits: 4294967295
---- !u!114 &98713219785827657
+--- !u!114 &1487178084652365207
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -243,7 +243,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 4757604522624138182}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ca90b08c74f75bb4e901ff6e3b25777b, type: 3}
+  m_Script: {fileID: 11500000, guid: 9958c7b415f21c043a136aeda8c6150a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   m_BindObjects:

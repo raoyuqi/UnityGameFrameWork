@@ -10,37 +10,33 @@ public class Test : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        var prefab = AssetsLoaderManager.Instance.LoadAssets<GameObject>("UI/Prefabs/Login/LoginPanel.prefab");
-        Debug.Log(prefab.name);
-        var go = GameObject.Instantiate(prefab, this.gameObject.transform);
-        Debug.Log(go.name + go.GetInstanceID());
+        UIManager.Instance.OpenPanel<LoginPanel>();
+        //var prefab = AssetsLoaderManager.Instance.LoadAssets<GameObject>("UI/Prefabs/Login/LoginPanel.prefab");
+        //Debug.Log(prefab.name);
+        //var go = GameObject.Instantiate(prefab, this.gameObject.transform);
+        //Debug.Log(go.name + go.GetInstanceID());
 
-        var UILayerManager = GameObject.Find("UIManager").GetComponent<UILayerManager>();
-        UILayerManager.SetLayer(go.GetComponent<UIPanelBase>());
+        //var UILayerManager = GameObject.Find("UIManager").GetComponent<UILayerManager>();
+        //UILayerManager.SetLayer(go.GetComponent<UIPanelBase>());
 
         UISignalSystem uISignalSystem = UISignalSystem.Instance;
         uISignalSystem.RegisterSignal(UISignal.OnOpened, (uIPanel, args) =>
         {
-            Debug.Log("uIPanel == " + uIPanel.name);
-            Debug.Log("args[0] == " + args[0]);
-            Debug.Log("args[1] == " + args[1]);
+            Debug.Log("打开完成 " + uIPanel.name);
         });
 
-        uISignalSystem.RegisterSignal(UISignal.OnOpened, (uIPanel, args) =>
+        uISignalSystem.RegisterSignal(UISignal.initialized, (uIPanel, args) =>
         {
-            Debug.Log("uIPanel xx " + uIPanel.name);
-            Debug.Log("args[0] xx " + args[0]);
-            Debug.Log("args[1] xx " + args[1]);
+            Debug.Log("初始化完成 " + uIPanel.name);
         });
 
-        this.StartCoroutine(this.TestMethod(go));
+
+        uISignalSystem.RegisterSignal(UISignal.OnOpen, (uIPanel, args) =>
+        {
+            Debug.Log("正在打开界面 " + uIPanel.name);
+        });
+
+        //this.StartCoroutine(this.TestMethod(go));
         Debug.Log("********************************");
-    }
-    //IEnumerator
-    private IEnumerator TestMethod(GameObject go)
-    {
-        yield return new WaitForSeconds(3);
-        Debug.Log("3秒后");
-        UISignalSystem.Instance.RaiseSignal(UISignal.OnOpened, go.GetComponent<UIPanelBase>(), "hello world", 999);
     }
 }
