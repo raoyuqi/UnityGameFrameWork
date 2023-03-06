@@ -1,4 +1,5 @@
 ﻿using FrameWork.Core.Mixin;
+using FrameWork.Core.Modules.Pool;
 using FrameWork.Core.Modules.Signal;
 using FrameWork.Core.Modules.UI;
 using System.Collections.Generic;
@@ -28,7 +29,7 @@ namespace FrameWork.Core.Manager
         // 显示的独占UI
         private Stack<UIPanelBase> m_ShowExclusiveUIStack = new Stack<UIPanelBase>();
 
-
+        private IGameObjectPool m_GameObjectPool;
         private UISignalSystem m_UISignalSystem;
         private AssetsLoaderManager m_AssetsLoaderManager;
         private UILayerManager m_UILayerManager;
@@ -40,6 +41,7 @@ namespace FrameWork.Core.Manager
             this.m_UISignalSystem = UISignalSystem.Instance;
             this.m_AssetsLoaderManager = AssetsLoaderManager.Instance;
             this.m_UILayerManager = GameObject.Find(UI_MANAGER_ROOT_NAME).GetComponent<UILayerManager>();
+            this.m_GameObjectPool = new DefaultGameObjectPool();
         }
 
         #region 管理独占UI
@@ -286,7 +288,7 @@ namespace FrameWork.Core.Manager
 
         private UIPanelBase CreateUIPanel(GameObject prefab, string uiName)
         {
-            var go = GameObject.Instantiate(prefab);
+            var go = this.m_GameObjectPool.GetGameObject(prefab);
             var panel = go.GetComponent<UIPanelBase>();
 
             panel.OnInit();

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace FrameWork.Core.Modules.Event
+namespace FrameWork.Core.Modules.Pool
 {
     public class DefaultGameObjectPool : IGameObjectPool
     {
@@ -19,118 +19,156 @@ namespace FrameWork.Core.Modules.Event
             }
         }
 
-        // 回收利用池
-        private Dictionary<int, GameObject> m_RecyclePool = new Dictionary<int, GameObject>();
-        // 使用中的对象
-        private Dictionary<int, GameObject> m_UsingPool = new Dictionary<int, GameObject>();
-
-        public GameObject GetGameObject()
+        private Transform m_PoolRoot;
+        public Transform PoolRoot
         {
-            if (this.m_RecyclePool.Count == 0)
+            get
             {
-                // TODO: 创建一个对象并加入UsingPool，需要使用资源加载模块
+                if (this.m_PoolRoot == null)
+                {
+                    var root = new GameObject("[ObjectPool]");
+                    this.m_PoolRoot = root.transform;
+                    if (Application.isPlaying)
+                        UnityEngine.Object.DontDestroyOnLoad(this.m_PoolRoot);
+                }
+                return this.m_PoolRoot;
+            }
+        }
+
+        // 回收利用池
+        private Dictionary<string, Queue<GameObject>> m_RecyclePool = new Dictionary<string, Queue<GameObject>>();
+
+        /// <summary>
+        /// 使用预制体获取一个对象
+        /// </summary>
+        /// <param name="prefab">预制体</param>
+        /// <returns></returns>
+        public GameObject GetGameObject(GameObject prefab)
+        {
+            if (prefab == null)
+            {
+                Debug.LogError("GetGameObject 加载失败, prefab is null");
+                return null;
+            }
+
+            var poolName = prefab.name.Replace("(Clone)", "");
+            if (!this.m_RecyclePool.ContainsKey(poolName))
+                this.m_RecyclePool.Add(poolName, new Queue<GameObject>());
+
+            GameObject gameObject = null;
+            var pools = this.m_RecyclePool[poolName];
+            if (pools.Count == 0)
+            {
+                gameObject = UnityEngine.Object.Instantiate(prefab);
+                gameObject.SetActive(false);
+                gameObject.transform.SetParent(this.PoolRoot);
+                return gameObject;
             }
 
             // 从对象池中取出一个物体
-            var objectIdList = new List<int>();
-            objectIdList.AddRange(this.m_RecyclePool.Keys);
-            var objectId = objectIdList[0];
-            var gameObject = this.m_RecyclePool[objectId];
-            this.m_RecyclePool.Remove(objectId);
-
+            gameObject = pools.Dequeue();
             if (gameObject == null)
             {
                 Debug.LogError("GetGameObject 加载失败");
                 return gameObject;
             }
 
-            this.AddToUsingPool(objectId, gameObject);
             return gameObject;
         }
 
+        /// <summary>
+        /// 将物体放回对象池
+        /// </summary>
+        /// <param name="gameObject"></param>
         public void RecycleObject(GameObject gameObject)
         {
-            var objectId = gameObject.GetInstanceID();
-            if (this.m_RecyclePool.ContainsKey(objectId))
+            var poolName = gameObject.name.Replace("(Clone)", "");
+            if (!this.m_RecyclePool.ContainsKey(poolName))
             {
-                Debug.LogError($"RecyclePool 中已存在 key = {objectId} 的gameObject");
-                return;
-            }
-
-            GameObject go = null;
-            var ok = this.TryRemoveGameObjectFromUsingPool(objectId, out go);
-            if (ok)
-            {
-                go.SetActive(false);
-                this.m_RecyclePool.Add(objectId, go);
-            }
-        }
-
-        public void DestroyGameObject(GameObject gameObject)
-        {
-            GameObject go = null;
-            var objectId = gameObject.GetInstanceID();
-            var ok = this.TryRemoveGameObjectFromUsingPool(objectId, out go);
-            if (ok)
-            {
-                UnityEngine.Object.Destroy(go);
-                // 考虑是否触发回调
-                // TODO: 删除引用计数
-            }
-        }
-
-
-        public void Clean()
-        {
-            foreach (var item in this.m_RecyclePool)
-            {
-                var go = item.Value;
-                UnityEngine.Object.Destroy(go);
-                // 考虑是否触发回调
-                // TODO: 删除引用计数
-            }
-            this.m_RecyclePool.Clear();
-        }
-
-        private bool TryRemoveGameObjectFromUsingPool(int objectId, out GameObject gameObject)
-        {
-            gameObject = null;
-            if (!this.IsExistInUsingPool(gameObject))
-                return false;
-
-            gameObject = this.m_UsingPool[objectId];
-            this.m_UsingPool.Remove(objectId);
-            return true;
-        }
-
-        private void AddToUsingPool(int key, GameObject gameObject)
-        {
-            if (this.m_UsingPool.ContainsKey(key))
-            {
-                Debug.LogError($"UsingPool 中已存在 key = {key} 的gameObject");
+                Debug.LogError($"RecyclePool failed: 对象池不存在 poolName = {poolName}");
                 return;
             }
 
             if (gameObject == null)
             {
-                Debug.LogError("不允许把空物体加入到 UsingPool");
+                Debug.LogError("不允许把空物体加入到 RecyclePool");
                 return;
             }
 
-            this.m_UsingPool.Add(key, gameObject);
+            gameObject.SetActive(false);
+            gameObject.transform.SetParent(this.PoolRoot);
+            this.m_RecyclePool[poolName].Enqueue(gameObject);
         }
 
-        //判断对象是否在使用中
-        private bool IsExistInUsingPool(GameObject go)
+        /// <summary>
+        /// 销毁物体，且不放回对象池
+        /// </summary>
+        /// <param name="gameObject"></param>
+        public void DestroyGameObject(GameObject gameObject)
         {
-            var key = go.GetInstanceID();
-            if (!this.m_UsingPool.ContainsKey(key))
+            if (gameObject == null)
             {
-                Debug.LogError($"UsingPool 中不存在 objectId = {key} 的gameObject");
-                return false;
+                Debug.LogError("不允许销毁空物体");
+                return;
             }
 
-            return true;
+            UnityEngine.Object.Destroy(gameObject);
+            // 考虑是否触发回调
+            // TODO: 删除引用计数
+        }
+
+        /// <summary>
+        /// 清理所有对象池
+        /// </summary>
+        public void Clean()
+        {
+            foreach (var item in this.m_RecyclePool)
+            {
+                while (item.Value.Count > 0)
+                {
+                    var go = item.Value.Dequeue();
+                    UnityEngine.Object.Destroy(go);
+                    // 考虑是否触发回调
+                    // TODO: 删除引用计数
+                }
+            }
+            this.m_RecyclePool.Clear();
+        }
+
+        /// <summary>
+        /// 清理指定的对象池
+        /// </summary>
+        /// <param name="poolName"></param>
+        public void Clean(string poolName)
+        {
+            if (this.m_RecyclePool.TryGetValue(poolName, out Queue<GameObject> pool))
+            {
+                while (pool.Count > 0)
+                {
+                    var go = pool.Dequeue();
+                    UnityEngine.Object.Destroy(go);
+                    // 考虑是否触发回调
+                    // TODO: 删除引用计数
+                }
+            }
+            this.m_RecyclePool.Remove(poolName);
+        }
+
+        /// <summary>
+        /// 判断物体是否在对象池中
+        /// </summary>
+        /// <param name="gameObject">需要确定的物体</param>
+        /// <returns></returns>
+        public bool IsExistInPool(GameObject gameObject)
+        {
+            if (gameObject == null)
+                return false;
+
+            var poolName = gameObject.name.Replace("(Clone)", "");
+            if (!this.m_RecyclePool.ContainsKey(poolName))
+                return false;
+
+            return this.m_RecyclePool[poolName].Contains(gameObject);
         }
     }
 }
