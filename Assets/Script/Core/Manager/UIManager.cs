@@ -1,4 +1,5 @@
 ﻿using FrameWork.Core.Mixin;
+using FrameWork.Core.Modules.Pool;
 using FrameWork.Core.Modules.Signal;
 using FrameWork.Core.Modules.UI;
 using System.Collections.Generic;
@@ -28,18 +29,17 @@ namespace FrameWork.Core.Manager
         // 显示的独占UI
         private Stack<UIPanelBase> m_ShowExclusiveUIStack = new Stack<UIPanelBase>();
 
-
+        private IGameObjectPool m_GameObjectPool;
         private UISignalSystem m_UISignalSystem;
         private AssetsLoaderManager m_AssetsLoaderManager;
         private UILayerManager m_UILayerManager;
-
-        //private const string r_PathRoot = "UI/Prefabs/";
 
         public UIManager()
         {
             this.m_UISignalSystem = UISignalSystem.Instance;
             this.m_AssetsLoaderManager = AssetsLoaderManager.Instance;
             this.m_UILayerManager = GameObject.Find(UI_MANAGER_ROOT_NAME).GetComponent<UILayerManager>();
+            this.m_GameObjectPool = new DefaultGameObjectPool();
         }
 
         #region 管理独占UI
@@ -75,8 +75,6 @@ namespace FrameWork.Core.Manager
                 return;
             }
 
-            // TODO: 从缓存池获取GameObject
-
             var fullPath = UIAssetsConfig.PathConfit[panelName];
             this.m_AssetsLoaderManager.LoadAssetsAsync<GameObject>(fullPath, (prefab) =>
             {
@@ -89,7 +87,6 @@ namespace FrameWork.Core.Manager
 
                 this.m_UISignalSystem.RaiseSignal(UISignal.OnOpened, panel);
             });
-            // TODO：将go加入对象池，派发一些UI事件
         }
 
         private void ShowPanel(string panelName)
@@ -114,12 +111,7 @@ namespace FrameWork.Core.Manager
                 panel.OnHide();
                 this.ClosePanelHandle(panel, panelName);
                 this.m_UISignalSystem.RaiseSignal(UISignal.OnClosed, panel);
-                return;
             }
-
-
-            // 使用放回对象池代替Destroy
-            //GameObject.Destroy(panel.gameObject);
         }
 
         /// <summary>
@@ -284,9 +276,34 @@ namespace FrameWork.Core.Manager
         }
         #endregion
 
+        public void JumpToMainPanel()
+        {
+            // TODO: 跳转到主界面
+
+            this.m_ExclusiveUIPopups.Clear();
+            this.m_HideExclusiveUIStack.Clear();
+            this.m_ShowExclusiveUIStack.Clear();
+            // 打开的主界面入栈
+            //this.m_ShowExclusiveUIStack.Push();
+        }
+
+        public void DestroyAllPanel()
+        {
+            foreach (var item in this.m_UIPanelDic)
+            {
+                var go = item.Value.gameObject;
+                this.m_GameObjectPool.RecycleObject(go);
+            }
+            this.m_UIPanelDic.Clear();
+            this.m_ExclusiveUIPopups.Clear();
+            this.m_HideExclusiveUIStack.Clear();
+            this.m_ShowExclusiveUIStack.Clear();
+        }
+
         private UIPanelBase CreateUIPanel(GameObject prefab, string uiName)
         {
-            var go = GameObject.Instantiate(prefab);
+            // 从缓存池获取GameObject
+            var go = this.m_GameObjectPool.GetGameObject(prefab);
             var panel = go.GetComponent<UIPanelBase>();
 
             panel.OnInit();
