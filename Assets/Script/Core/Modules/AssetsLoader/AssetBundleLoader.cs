@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections;
 using UnityEngine;
+using UnityObject = UnityEngine.Object;
 
 namespace FrameWork.Core.Modules.AssetsLoader
 {
     public sealed class AssetBundleLoader : IAssetsLoader
     {
-        public UnityEngine.Object LoadAssets(string path)
+        public UnityObject LoadAssets(string path)
         {
             var assetBundle = this.LoadAssetBundle(path);
             if (assetBundle != null)
