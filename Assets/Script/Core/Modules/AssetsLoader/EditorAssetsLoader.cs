@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using FrameWork.Core.Manager;
+using System.Collections;
 using System.IO;
 using UnityEditor;
 using UnityEngine;
@@ -26,7 +27,7 @@ namespace FrameWork.Core.Modules.AssetsLoader
                 return default(AssetData);
             }
 
-            var assetData = new AssetData(path, null, new UnityObject[] { assets });
+            var assetData = new AssetData(path, new UnityObject[] { assets });
             return assetData;
         }
 
@@ -46,11 +47,16 @@ namespace FrameWork.Core.Modules.AssetsLoader
                 return default(AssetData);
             }
 
-            var assetData = new AssetData(path, null, new UnityObject[] { assets });
+            var assetData = new AssetData(path, new UnityObject[] { assets });
             return assetData;
         }
 
-        public IEnumerator LoadAssetsAsync<T>(string path, System.Action<AssetData> callback = null) where T : UnityObject
+        public void LoadAssetAsync<T>(string path, System.Action<AssetData> callback = null) where T : UnityObject
+        {
+            MonoBehaviourRuntime.Instance.StartCoroutine(this.LoadAssetIEnumerator<T>(path, callback));
+        }
+
+        private IEnumerator LoadAssetIEnumerator<T>(string path, System.Action<AssetData> callback = null) where T : UnityObject
         {
             yield return null;
             var assets = this.LoadAssets<T>(path);

@@ -339,6 +339,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 77cc5ef599e460e43900a1c4adeda749, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  IsAssetBundle: 0
 --- !u!1001 &4140444201134527069
 PrefabInstance:
   m_ObjectHideFlags: 0

@@ -14,7 +14,7 @@ namespace FrameWork.Core.Modules.AssetsLoader
                 return default(AssetData);
 
             var assets = assetBundle.LoadAllAssets();
-            var assetData = new AssetData(path, assetBundle, assets);
+            var assetData = new AssetData(path, assets, assetBundle);
             return assetData;
         }
 
@@ -25,10 +25,15 @@ namespace FrameWork.Core.Modules.AssetsLoader
 
         public void LoadAssetsAsync(string path, Action<AssetData> callback = null)
         {
-            MonoBehaviourRuntime.Instance.StartCoroutine(this.LoadAssetsIEnumerator(path, callback));
+            MonoBehaviourRuntime.Instance.StartCoroutine(this.LoadAssetIEnumerator(path, callback));
         }
 
-        private IEnumerator LoadAssetsIEnumerator(string path, Action<AssetData> callback = null)
+        public void LoadAssetAsync<T>(string path, Action<AssetData> callback = null) where T : UnityEngine.Object
+        {
+            MonoBehaviourRuntime.Instance.StartCoroutine(this.LoadAssetIEnumerator(path, callback));
+        }
+
+        private IEnumerator LoadAssetIEnumerator(string path, Action<AssetData> callback = null)
         {
             var bundleRequest = AssetBundle.LoadFromFileAsync(path);
             yield return bundleRequest;
@@ -44,7 +49,7 @@ namespace FrameWork.Core.Modules.AssetsLoader
             yield return assetRequest;
 
             var assets = assetRequest.allAssets;
-            var assetData = new AssetData(path, assetBundle, assets);
+            var assetData = new AssetData(path, assets, assetBundle);
             if (callback != null)
                 callback(assetData);
         }

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Game.Config;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Profiling;
 using UnityObject = UnityEngine.Object;
@@ -16,14 +17,15 @@ namespace FrameWork.Core.Modules.AssetsLoader
 
         public int m_RefCount { get; private set; }
 
-        public AssetData(string assetPath, AssetBundle assetBundle, UnityObject[] objects)
+        public AssetData(string assetPath, UnityObject[] objects, AssetBundle assetBundle = null)
         {
             this.m_RefCount = 0;
             this.m_ObjectSize = -1;
             this.m_BundleSize = -1;
             this.m_AssetPath = assetPath;
             this.m_Objects = objects;
-            this.m_AssetBundle = assetBundle;
+            if (AppConst.IsAssetBundle)
+                this.m_AssetBundle = assetBundle;
         }
 
         public UnityObject[] LoadAllAssets()
@@ -59,17 +61,20 @@ namespace FrameWork.Core.Modules.AssetsLoader
                 Debug.LogError($"异常：资源引用计数为负数, AssetPath = {this.m_AssetPath}, RefCount = {this.m_RefCount}");
         }
 
-        //public void LoadAllAssetsAsync(UnityAction<UnityObject[]> callBack = null)
-        //{
-        //    MonoBehaviourRuntime.Instance.StartCoroutine(LoadAllAssetsIEnumerator(callBack));
-        //}
+        public UnityObject LoadAsset(string name)
+        {
+            if (this.m_Objects == null)
+                return default;
 
-        //public void LoadAllAssetsAsync<T>(UnityAction<T[]> callBack = null) where T : UnityObject
-        //{
-        //    MonoBehaviourRuntime.Instance.StartCoroutine(LoadAllAssetsIEnumerator(callBack));
-        //}
+            foreach (var obj in this.m_Objects)
+            {
+                if (obj.name == name)
+                    return obj;
+            }
+            return default;
+        }
 
-        public UnityObject LoadAsset<T>(string name) where T : UnityObject
+        public T LoadAsset<T>(string name) where T : UnityObject
         {
             if (this.m_Objects == null)
                 return default(T);
@@ -81,52 +86,6 @@ namespace FrameWork.Core.Modules.AssetsLoader
             }
             return default(T);
         }
-
-        //public void LoadAssetAsync<T>(string name, UnityAction<UnityObject> callBack = null)
-        //{
-        //    MonoBehaviourRuntime.Instance.StartCoroutine(LoadAssetIEnumerator<T>(name, callBack));
-        //}
-
-        //private IEnumerator LoadAllAssetsIEnumerator(UnityAction<UnityObject[]> callBack = null)
-        //{
-        //    if (this.AssetBundle == null)
-        //        throw new System.Exception();
-
-        //    var request = this.AssetBundle.LoadAllAssetsAsync();
-        //    yield return request;
-
-        //    this.UpdateObjectsMemorySize(request.allAssets);
-        //    var assets = request.allAssets;
-        //    if (callBack != null)
-        //        callBack(assets);
-        //}
-
-        //private IEnumerator LoadAllAssetsIEnumerator<T>(UnityAction<T[]> callBack = null)
-        //{
-        //    if (this.m_AssetBundle == null)
-        //        throw new System.Exception();
-
-        //    var request = this.m_AssetBundle.LoadAllAssetsAsync<T>();
-        //    yield return request;
-
-        //    this.UpdateObjectsMemorySize(request.allAssets);
-        //    var assets = request.allAssets as T[];
-        //    if (callBack != null)
-        //        callBack(assets);
-        //}
-
-        //private IEnumerator LoadAssetIEnumerator<T>(string name, UnityAction<UnityObject> callBack = null)
-        //{
-        //    if (this.m_AssetBundle == null)
-        //        throw new System.Exception();
-
-        //    var request = this.m_AssetBundle.LoadAssetAsync<T>(name);
-        //    yield return request;
-
-        //    this.UpdateObjectsMemorySize(request.asset);
-        //    if (callBack != null)
-        //        callBack(request.asset);
-        //}
 
         /// <summary>
         /// 获取资源占用内存

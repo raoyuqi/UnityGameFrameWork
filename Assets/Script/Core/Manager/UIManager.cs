@@ -76,7 +76,7 @@ namespace FrameWork.Core.Manager
             }
 
             var fullPath = UIAssetsConfig.PathConfit[panelName];
-            this.m_AssetsLoaderManager.LoadAssetsAsync<GameObject>(fullPath, (prefab) =>
+            this.m_AssetsLoaderManager.LoadAssetAsync<GameObject>(fullPath, (prefab) =>
             {
                 var panel = this.CreateUIPanel(prefab, panelName);
                 this.m_UISignalSystem.RaiseSignal(UISignal.OnOpen, panel);
@@ -207,7 +207,7 @@ namespace FrameWork.Core.Manager
             }
 
             var fullPath = UIAssetsConfig.PathConfit[popupName];
-            this.m_AssetsLoaderManager.LoadAssetsAsync<GameObject>(fullPath, (prefab) =>
+            this.m_AssetsLoaderManager.LoadAssetAsync<GameObject>(fullPath, (prefab) =>
             {
                 var popup = this.CreateUIPanel(prefab, popupName);
                 this.m_UISignalSystem.RaiseSignal(UISignal.OnOpen, popup);

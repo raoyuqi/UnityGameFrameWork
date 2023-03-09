@@ -9,6 +9,6 @@ namespace FrameWork.Core.Modules.AssetsLoader
 
         AssetData LoadAssets<T>(string path) where T : Object;
 
-        void LoadAssetsAsync(string path, System.Action<AssetData> callback = null);
+        void LoadAssetAsync<T>(string path, System.Action<AssetData> callback = null) where T : Object;
     }
 }

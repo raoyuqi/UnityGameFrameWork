@@ -60,13 +60,14 @@ namespace FrameWork.Core.Modules.Pool
             if (pools.Count == 0)
             {
                 gameObject = UnityEngine.Object.Instantiate(prefab);
-                gameObject.SetActive(false);
+                gameObject.SetActive(true);
                 gameObject.transform.SetParent(this.PoolRoot);
                 return gameObject;
             }
 
             // 从对象池中取出一个物体
             gameObject = pools.Dequeue();
+            gameObject.SetActive(true);
             if (gameObject == null)
             {
                 Debug.LogError("GetGameObject 加载失败");
