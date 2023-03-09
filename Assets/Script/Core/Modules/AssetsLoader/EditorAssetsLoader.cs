@@ -2,6 +2,7 @@
 using System.IO;
 using UnityEditor;
 using UnityEngine;
+using UnityObject = UnityEngine.Object;
 
 namespace FrameWork.Core.Modules.AssetsLoader
 {
@@ -9,31 +10,32 @@ namespace FrameWork.Core.Modules.AssetsLoader
     {
         private const string r_AssetsPathRoot = "Assets/AssetsPackage/";
 
-        public Object LoadAssets(string path)
+        public AssetData LoadAssets(string path)
         {
             if (string.IsNullOrEmpty(path))
             {
                 Debug.LogError("LoadAssets field: 非法资源路径");
-                return null;
+                return default(AssetData);
             }
 
             var assetsPath = Path.Combine(r_AssetsPathRoot, path);
-            var assets = AssetDatabase.LoadAssetAtPath(assetsPath, typeof(Object));
+            var assets = AssetDatabase.LoadAssetAtPath(assetsPath, typeof(UnityObject));
             if (assets == null)
             {
                 Debug.LogError($"资源不存在，Path = {assetsPath}");
-                return null;
+                return default(AssetData);
             }
 
-            return assets;
+            var assetData = new AssetData(path, null, new UnityObject[] { assets });
+            return assetData;
         }
 
-        public T LoadAssets<T>(string path) where T : Object
+        public AssetData LoadAssets<T>(string path) where T : UnityObject
         {
             if (string.IsNullOrEmpty(path))
             {
                 Debug.LogError("LoadAssets field: 非法资源路径");
-                return null;
+                return default(AssetData);
             }
 
             var assetsPath = Path.Combine(r_AssetsPathRoot, path);
@@ -41,13 +43,14 @@ namespace FrameWork.Core.Modules.AssetsLoader
             if (assets == null)
             {
                 Debug.LogError($"资源不存在，Path = {assetsPath}");
-                return null;
+                return default(AssetData);
             }
 
-            return assets;
+            var assetData = new AssetData(path, null, new UnityObject[] { assets });
+            return assetData;
         }
 
-        public IEnumerator LoadAssetsAsync<T>(string path, System.Action<T> callback = null) where T : Object
+        public IEnumerator LoadAssetsAsync<T>(string path, System.Action<AssetData> callback = null) where T : UnityObject
         {
             yield return null;
             var assets = this.LoadAssets<T>(path);
