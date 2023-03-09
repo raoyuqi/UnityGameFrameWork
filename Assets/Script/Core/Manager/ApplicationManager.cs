@@ -20,6 +20,11 @@ public class ApplicationManager : MonoBehaviour
         else
             AssetsLoaderManager.Instance.AssetsLoader = new EditorAssetsLoader();
 
+        //#if UNITY_EDITOR
+        //        AssetsLoaderManager.Instance.AssetsLoader = new EditorAssetsLoader();
+        //#else
+        //        AssetsLoaderManager.Instance.AssetsLoader = new AssetBundleLoader();
+        //#endif
         //if (Application.platform == RuntimePlatform.Android || Application.platform == RuntimePlatform.IPhonePlayer)
         //    AssetsLoaderManager.Instance.AssetsLoader = new AssetBundleLoader();
 

@@ -19,6 +19,7 @@ namespace FrameWork.Core.Modules.AssetsLoader
                 return default(AssetData);
             }
 
+#if UNITY_EDITOR
             var assetsPath = Path.Combine(r_AssetsPathRoot, path);
             var assets = AssetDatabase.LoadAssetAtPath(assetsPath, typeof(UnityObject));
             if (assets == null)
@@ -29,6 +30,9 @@ namespace FrameWork.Core.Modules.AssetsLoader
 
             var assetData = new AssetData(path, new UnityObject[] { assets });
             return assetData;
+#else
+            return default;
+#endif
         }
 
         public AssetData LoadAssets<T>(string path) where T : UnityObject
@@ -39,6 +43,7 @@ namespace FrameWork.Core.Modules.AssetsLoader
                 return default(AssetData);
             }
 
+#if UNITY_EDITOR
             var assetsPath = Path.Combine(r_AssetsPathRoot, path);
             var assets = AssetDatabase.LoadAssetAtPath<T>(assetsPath);
             if (assets == null)
@@ -49,6 +54,9 @@ namespace FrameWork.Core.Modules.AssetsLoader
 
             var assetData = new AssetData(path, new UnityObject[] { assets });
             return assetData;
+#else
+            return default;
+#endif
         }
 
         public void LoadAssetAsync<T>(string path, System.Action<AssetData> callback = null) where T : UnityObject
