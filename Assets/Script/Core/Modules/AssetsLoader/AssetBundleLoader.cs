@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FrameWork.Core.Manager;
+using System;
 using System.Collections;
 using UnityEngine;
 
@@ -6,25 +7,51 @@ namespace FrameWork.Core.Modules.AssetsLoader
 {
     public sealed class AssetBundleLoader : IAssetsLoader
     {
-        public UnityEngine.Object LoadAssets(string path)
+        public AssetData LoadAssets(string path)
         {
             var assetBundle = this.LoadAssetBundle(path);
-            if (assetBundle != null)
+            if (assetBundle == null)
+                return default(AssetData);
+
+            var assets = assetBundle.LoadAllAssets();
+            var assetData = new AssetData(path, assets, assetBundle);
+            return assetData;
+        }
+
+        public AssetData LoadAssets<T>(string path) where T : UnityEngine.Object
+        {
+            return this.LoadAssets(path);
+        }
+
+        public void LoadAssetsAsync(string path, Action<AssetData> callback = null)
+        {
+            MonoBehaviourRuntime.Instance.StartCoroutine(this.LoadAssetIEnumerator(path, callback));
+        }
+
+        public void LoadAssetAsync<T>(string path, Action<AssetData> callback = null) where T : UnityEngine.Object
+        {
+            MonoBehaviourRuntime.Instance.StartCoroutine(this.LoadAssetIEnumerator(path, callback));
+        }
+
+        private IEnumerator LoadAssetIEnumerator(string path, Action<AssetData> callback = null)
+        {
+            var bundleRequest = AssetBundle.LoadFromFileAsync(path);
+            yield return bundleRequest;
+
+            var assetBundle = bundleRequest.assetBundle;
+            if (assetBundle == null)
             {
-                
+                Debug.LogError($"AssetBundle 不存在, path = {path}");
+                yield break;
             }
-            // TODO: 返回一个AssetData对象
-            return null;
-        }
 
-        public T LoadAssets<T>(string path) where T : UnityEngine.Object
-        {
-            throw new NotImplementedException();
-        }
+            var assetRequest = assetBundle.LoadAllAssetsAsync();
+            yield return assetRequest;
 
-        public IEnumerator LoadAssetsAsync<T>(string path, Action<T> callback = null) where T : UnityEngine.Object
-        {
-            throw new NotImplementedException();
+            var assets = assetRequest.allAssets;
+            var assetData = new AssetData(path, assets, assetBundle);
+            if (callback != null)
+                callback(assetData);
         }
 
         private AssetBundle LoadAssetBundle(string path)

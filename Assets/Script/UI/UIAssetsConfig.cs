@@ -7,6 +7,6 @@ public static class UIAssetsConfig
 {
     public static Dictionary<string, string> PathConfit = new Dictionary<string, string>()
     {
-        { "LoginPanel", "UI/Prefabs/Login/LoginPanel.prefab" }
+        { "LoginPanel", "Prefabs/Login/LoginPanel.prefab" }
     };
 }
