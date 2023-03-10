@@ -1,4 +1,5 @@
 ﻿using FrameWork.Core.Manager;
+using FrameWork.Core.Utils;
 using System;
 using System.Collections;
 using UnityEngine;
@@ -7,41 +8,43 @@ namespace FrameWork.Core.Modules.AssetsLoader
 {
     public sealed class AssetBundleLoader : IAssetsLoader
     {
-        public AssetData LoadAssets(string path)
+        public AssetData LoadAssets(string relativelyPath)
         {
+            var path = PathTool.GetAssetAbsolutePath(relativelyPath);
             var assetBundle = this.LoadAssetBundle(path);
             if (assetBundle == null)
                 return default(AssetData);
 
             var assets = assetBundle.LoadAllAssets();
-            var assetData = new AssetData(path, assets, assetBundle);
+            var assetData = new AssetData(relativelyPath, assets, assetBundle);
             return assetData;
         }
 
-        public AssetData LoadAssets<T>(string path) where T : UnityEngine.Object
+        public AssetData LoadAssets<T>(string relativelyPath) where T : UnityEngine.Object
         {
-            return this.LoadAssets(path);
+            return this.LoadAssets(relativelyPath);
         }
 
-        public void LoadAssetsAsync(string path, Action<AssetData> callback = null)
+        public void LoadAssetsAsync(string relativelyPath, Action<AssetData> callback = null)
         {
-            MonoBehaviourRuntime.Instance.StartCoroutine(this.LoadAssetIEnumerator(path, callback));
+            MonoBehaviourRuntime.Instance.StartCoroutine(this.LoadAssetIEnumerator(relativelyPath, callback));
         }
 
-        public void LoadAssetAsync<T>(string path, Action<AssetData> callback = null) where T : UnityEngine.Object
+        public void LoadAssetAsync<T>(string relativelyPath, Action<AssetData> callback = null) where T : UnityEngine.Object
         {
-            MonoBehaviourRuntime.Instance.StartCoroutine(this.LoadAssetIEnumerator(path, callback));
+            MonoBehaviourRuntime.Instance.StartCoroutine(this.LoadAssetIEnumerator(relativelyPath, callback));
         }
 
-        private IEnumerator LoadAssetIEnumerator(string path, Action<AssetData> callback = null)
+        private IEnumerator LoadAssetIEnumerator(string relativelyPath, Action<AssetData> callback = null)
         {
+            var path = PathTool.GetAssetAbsolutePath(relativelyPath);
             var bundleRequest = AssetBundle.LoadFromFileAsync(path);
             yield return bundleRequest;
 
             var assetBundle = bundleRequest.assetBundle;
             if (assetBundle == null)
             {
-                Debug.LogError($"AssetBundle 不存在, path = {path}");
+                Debug.LogError($"AssetBundle 不存在, path = {relativelyPath}");
                 yield break;
             }
 
@@ -49,7 +52,7 @@ namespace FrameWork.Core.Modules.AssetsLoader
             yield return assetRequest;
 
             var assets = assetRequest.allAssets;
-            var assetData = new AssetData(path, assets, assetBundle);
+            var assetData = new AssetData(relativelyPath, assets, assetBundle);
             if (callback != null)
                 callback(assetData);
         }

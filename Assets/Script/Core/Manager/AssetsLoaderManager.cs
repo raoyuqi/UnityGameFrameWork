@@ -1,5 +1,7 @@
 ﻿using FrameWork.Core.Mixin;
 using FrameWork.Core.Modules.AssetsLoader;
+using FrameWork.Core.Utils;
+using Game.Config;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -15,13 +17,23 @@ namespace FrameWork.Core.Manager
         private IAssetsLoader m_AssetsLoader;
         public IAssetsLoader AssetsLoader
         {
-            get { return this.m_AssetsLoader; }
-            set
+            get
             {
                 if (this.m_AssetsLoader != null)
-                    throw new System.Exception("资源加载器初始化后，不允许修改！");
+                    return this.m_AssetsLoader;
 
-                this.m_AssetsLoader = value;
+                if (AppConst.IsAssetBundle)
+                    this.m_AssetsLoader = new AssetBundleLoader();
+                else
+                    this.m_AssetsLoader = new EditorAssetsLoader();
+
+                //#if UNITY_EDITOR
+                //        this.m_AssetsLoader = new EditorAssetsLoader();
+                //#else
+                //        this.m_AssetsLoader = new AssetBundleLoader();
+                //#endif
+
+                return this.m_AssetsLoader;
             }
         }
 

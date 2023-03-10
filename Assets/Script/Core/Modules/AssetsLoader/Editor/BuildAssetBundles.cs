@@ -1,14 +1,19 @@
-﻿using System.Collections;
+﻿using FrameWork.Core.Utils;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using UnityEditor;
+using UnityEditor.Sprites;
+using UnityEditor.U2D;
 using UnityEngine;
+using UnityEngine.U2D;
 
 public class BuildAssetBundles
 {
     private static string _ASSETS_DIRECTORY_ROOT = PathCombine(Application.dataPath, "AssetsPackage");
     private const string _PREFABS_ROOT_DIR = "Prefabs/";
+    private const string _SPRITE_ATLAS_ROOT_DIR = "SpriteAltas/";
     private const string _RELATIVE_ROOT_DIR = "Assets/AssetsPackage";
 
     private static string PathCombine(params string[] paths) => string.Join(
@@ -80,12 +85,75 @@ public class BuildAssetBundles
         //Debug.Log("***************** ");
 
         var buildList = new List<AssetBundleBuild>();
+        BuildAtlasAssetBundle(buildList);
+        BuildImageAssetBundle(buildList);
         BuildPrefabAssetBundle(buildList);
 
         AssetBundleBuild[] buildMap = buildList.ToArray();
         BuildPipeline.BuildAssetBundles(Application.streamingAssetsPath, buildMap, BuildAssetBundleOptions.None, BuildTarget.StandaloneWindows);
+        AssetDatabase.Refresh();
     }
 
+    // 打包图集
+    private static void BuildAtlasAssetBundle(List<AssetBundleBuild> buildList)
+    {
+        var path = PathCombine(_ASSETS_DIRECTORY_ROOT, _SPRITE_ATLAS_ROOT_DIR);
+        if (!Directory.Exists(path))
+        {
+            Debug.LogError($"文件夹不存在: path = {path}");
+            return;
+        }
+
+        BuildSpriteAtlas(path);
+
+        var dir = new DirectoryInfo(path);
+        var files = dir.GetFiles("*", SearchOption.AllDirectories);
+        foreach (var fileInfo in files)
+        {
+            if (fileInfo.Name.EndsWith(".meta"))
+                continue;
+
+            var name = PathTool.GetDirectoryRelativelyPath($"{_ASSETS_DIRECTORY_ROOT}/", fileInfo.FullName);
+            buildList.Add(new AssetBundleBuild()
+            {
+                assetBundleName = name,
+                assetNames = new string[] { PathCombine(_RELATIVE_ROOT_DIR, name) }
+            });
+        }
+    }
+
+    // 打包静态图片
+    private static void BuildImageAssetBundle(List<AssetBundleBuild> buildList)
+    {
+        var path = PathCombine(_ASSETS_DIRECTORY_ROOT, "Temp");
+        if (!Directory.Exists(path))
+        {
+            Debug.LogError($"文件夹不存在: path = {path}");
+            return;
+        }
+
+        var dir = new DirectoryInfo(path);
+        var files = dir.GetFiles("*", SearchOption.AllDirectories);
+
+        var assetNames = new List<string>();
+        foreach (var fileInfo in files)
+        {
+            if (fileInfo.Name.EndsWith(".meta"))
+                continue;
+
+            var name = PathTool.GetDirectoryRelativelyPath($"{_ASSETS_DIRECTORY_ROOT}/", fileInfo.FullName);
+            //Debug.Log(PathCombine(_RELATIVE_ROOT_DIR, name));
+            assetNames.Add(PathCombine(_RELATIVE_ROOT_DIR, name));
+        }
+
+        buildList.Add(new AssetBundleBuild()
+        {
+            assetBundleName = "Temp/Image/Bundle.static",
+            assetNames = assetNames.ToArray()
+        });
+    }
+
+    // 打包预制体
     private static void BuildPrefabAssetBundle(List<AssetBundleBuild> buildList)
     {
         var path = PathCombine(_ASSETS_DIRECTORY_ROOT, _PREFABS_ROOT_DIR);
@@ -102,12 +170,69 @@ public class BuildAssetBundles
             if (fileInfo.Name.EndsWith(".meta"))
                 continue;
 
-            var name = PathCombine(fileInfo.FullName).Replace(_ASSETS_DIRECTORY_ROOT + "/", "");
+            var name = PathTool.GetDirectoryRelativelyPath($"{_ASSETS_DIRECTORY_ROOT}/", fileInfo.FullName);
             buildList.Add(new AssetBundleBuild()
             {
                 assetBundleName = name,
                 assetNames = new string[] { PathCombine(_RELATIVE_ROOT_DIR, name) }
             });
         }
+    }
+
+    // 创建图集
+    private static void BuildSpriteAtlas(string dirPath)
+    {
+        if (!Directory.Exists(dirPath))
+        {
+            Debug.LogError($"文件夹不存在: path = {dirPath}");
+            return;
+        }
+
+        var targetRoot = "Assets/AssetsPackage/SpriteAltas/";
+        var sourceRoot = "Assets/AssetsPackage/Arts/Atlas";
+        var dir = new DirectoryInfo(dirPath);
+        var dirs = dir.GetDirectories();
+        if (dirs.Length == 0)
+            return;
+
+        foreach (var dirInfo in dirs)
+        {
+            var relativelyPath = PathTool.GetDirectoryRelativelyPath(dirPath, dirInfo.FullName);
+            var spriteAtlasPath = $"{PathTool.PathCombine(targetRoot, relativelyPath)}.spriteatlas";
+
+            var spriteAtlas = new SpriteAtlas();
+            var packingSetting = new SpriteAtlasPackingSettings()
+            {
+                enableRotation = false,
+                enableTightPacking = false,
+                padding = 2,
+            };
+            spriteAtlas.SetPackingSettings(packingSetting);
+            spriteAtlas.SetIncludeInBuild(true);
+
+            var spriteList = new List<Sprite>();
+            var files = dirInfo.GetFiles("*", SearchOption.TopDirectoryOnly);
+            foreach (var fileInfo in files)
+            {
+                if (fileInfo.Name.EndsWith(".meta"))
+                    continue;
+
+                var spritePath = PathTool.PathCombine(sourceRoot, relativelyPath, fileInfo.Name);
+                var sprite = AssetDatabase.LoadAssetAtPath<Sprite>(spritePath);
+                if (sprite != null)
+                    spriteList.Add(sprite);
+            }
+
+            if (spriteList.Count > 0)
+            {
+                spriteAtlas.Add(spriteList.ToArray());
+                AssetDatabase.CreateAsset(spriteAtlas, spriteAtlasPath);
+                SpriteAtlasUtility.PackAtlases(new[] { spriteAtlas }, EditorUserBuildSettings.activeBuildTarget);
+            }
+
+            BuildSpriteAtlas(dirInfo.FullName);
+        }
+
+        AssetDatabase.Refresh();
     }
 }

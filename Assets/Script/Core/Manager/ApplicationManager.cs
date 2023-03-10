@@ -15,21 +15,5 @@ public class ApplicationManager : MonoBehaviour
     private void Awake()
     {
         AppConst.IsAssetBundle = this.IsAssetBundle;
-        if (this.IsAssetBundle)
-            AssetsLoaderManager.Instance.AssetsLoader = new AssetBundleLoader();
-        else
-            AssetsLoaderManager.Instance.AssetsLoader = new EditorAssetsLoader();
-
-        //#if UNITY_EDITOR
-        //        AssetsLoaderManager.Instance.AssetsLoader = new EditorAssetsLoader();
-        //#else
-        //        AssetsLoaderManager.Instance.AssetsLoader = new AssetBundleLoader();
-        //#endif
-        //if (Application.platform == RuntimePlatform.Android || Application.platform == RuntimePlatform.IPhonePlayer)
-        //    AssetsLoaderManager.Instance.AssetsLoader = new AssetBundleLoader();
-
-        //#if !UNITY_EDITOR
-        //    AssetsLoaderManager.Instance.AssetsLoader = new AssetBundleLoader();
-        //#endif
     }
 }
