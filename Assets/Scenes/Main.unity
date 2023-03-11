@@ -340,6 +340,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   IsAssetBundle: 1
+  AssetCacheCount: 30
 --- !u!1001 &4140444201134527069
 PrefabInstance:
   m_ObjectHideFlags: 0

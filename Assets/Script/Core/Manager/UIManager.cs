@@ -2,6 +2,7 @@
 using FrameWork.Core.Modules.Pool;
 using FrameWork.Core.Modules.Signal;
 using FrameWork.Core.Modules.UI;
+using Game.Config;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -39,7 +40,7 @@ namespace FrameWork.Core.Manager
             this.m_UISignalSystem = UISignalSystem.Instance;
             this.m_AssetsLoaderManager = AssetsLoaderManager.Instance;
             this.m_UILayerManager = GameObject.Find(UI_MANAGER_ROOT_NAME).GetComponent<UILayerManager>();
-            this.m_GameObjectPool = new DefaultGameObjectPool();
+            this.m_GameObjectPool = AppConst.UIGameObjectPool;
         }
 
         #region 管理独占UI

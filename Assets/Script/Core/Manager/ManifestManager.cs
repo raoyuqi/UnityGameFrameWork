@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace FrameWork.Core.Manager
 {
-    public class ManifestManager : SingletonBase<ManifestManager>
+    public sealed class ManifestManager : SingletonBase<ManifestManager>
     {
         private AssetBundle m_MainAssetBundle;
         private AssetBundleManifest m_AssetBundleManifest;

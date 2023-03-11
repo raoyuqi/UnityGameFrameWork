@@ -36,7 +36,10 @@ namespace FrameWork.Core.Manager
             var assetData = this.m_AssetDataCache[path];
             if (assetData == null)
             {
-                assetData = this.AssetsLoader.LoadAssets(path);
+                // 尝试从缓存中获取
+                if (!MemoryManger.Instance.TryGetAssetData(path, out assetData))
+                    assetData = this.AssetsLoader.LoadAssets(path);
+
                 this.m_AssetDataCache.Add(path, assetData);
             }
 
@@ -54,7 +57,10 @@ namespace FrameWork.Core.Manager
             var assetData = this.m_AssetDataCache[path];
             if (assetData == null)
             {
-                assetData = this.AssetsLoader.LoadAssets<T>(path);
+                // 尝试从缓存中获取
+                if (!MemoryManger.Instance.TryGetAssetData(path, out assetData))
+                    assetData = this.AssetsLoader.LoadAssets<T>(path);
+
                 this.m_AssetDataCache.Add(path, assetData);
             }
 
@@ -68,6 +74,20 @@ namespace FrameWork.Core.Manager
         public void LoadAssetAsync<T>(string path, System.Action<T> callback = null) where T : UnityObject
         {
             MonoBehaviourRuntime.Instance.StartCoroutine(this.LoadAssetIEnumerator<T>(path, callback));
+        }
+
+        public void FreeAsset(string path)
+        {
+            if (this.m_AssetDataCache.TryGetValue(path, out AssetData assetData))
+            {
+                assetData.UpdateRefCount(-1);
+                if (assetData.RefCount == 0)
+                {
+                    // 添加到卸载队列
+                    this.m_AssetDataCache.Remove(path);
+                    MemoryManger.Instance.AddToNoUseCache(path, assetData);
+                }
+            }
         }
 
         private void LoadDependencies(string relativelyPath)
@@ -91,6 +111,15 @@ namespace FrameWork.Core.Manager
                 if (callback != null)
                     callback(asset);
             }
+            else if (MemoryManger.Instance.TryGetAssetData(path, out assetData))
+            {
+                // 尝试从缓存中获取
+                assetData.UpdateRefCount(1);
+                this.m_AssetDataCache.Add(path, assetData);
+                var asset = assetData.LoadAsset<T>(path);
+                if (callback != null)
+                    callback(asset);
+            }
             else
             {
                 yield return this.AssetsLoader.LoadAssetIEnumerator(path, (ret) => {
@@ -105,7 +134,6 @@ namespace FrameWork.Core.Manager
             yield return 0;
         }
 
-        // TODO: 未处理循环依赖
         private IEnumerator LoadDependenciesIEnumerator<T>(string path) where T : UnityObject
         {
             if (AppConst.IsAssetBundle)
