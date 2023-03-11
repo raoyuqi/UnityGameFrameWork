@@ -29,7 +29,7 @@ namespace FrameWork.Core.Manager
             }
         }
 
-        public UnityObject LoadAssets(string path)
+        public AssetData LoadAsset(string path)
         {
             this.LoadDependencies(path);
 
@@ -47,10 +47,10 @@ namespace FrameWork.Core.Manager
                 return default;
 
             assetData.UpdateRefCount(1);
-            return assetData.LoadAsset(path);
+            return assetData;
         }
 
-        public T LoadAssets<T>(string path) where T : UnityObject
+        public AssetData LoadAsset<T>(string path) where T : UnityObject
         {
             this.LoadDependencies(path);
 
@@ -65,13 +65,13 @@ namespace FrameWork.Core.Manager
             }
 
             if (assetData == null)
-                return default(T);
+                return default;
 
             assetData.UpdateRefCount(1);
-            return assetData.LoadAsset<T>(path);
+            return assetData;
         }
 
-        public void LoadAssetAsync<T>(string path, System.Action<T> callback = null) where T : UnityObject
+        public void LoadAssetAsync<T>(string path, System.Action<AssetData> callback = null) where T : UnityObject
         {
             MonoBehaviourRuntime.Instance.StartCoroutine(this.LoadAssetIEnumerator<T>(path, callback));
         }
@@ -96,38 +96,35 @@ namespace FrameWork.Core.Manager
             {
                 var dependencies = ManifestManager.Instance.GetAssetBundleDependencies(relativelyPath);
                 foreach (var bundleName in dependencies)
-                    this.LoadAssets(bundleName);
+                    this.LoadAsset(bundleName);
             }
         }
 
-        private IEnumerator LoadAssetIEnumerator<T>(string path, System.Action<T> callback = null) where T : UnityObject
+        private IEnumerator LoadAssetIEnumerator<T>(string path, System.Action<AssetData> callback = null) where T : UnityObject
         {
             yield return this.LoadDependenciesIEnumerator<T>(path);
 
             if (this.m_AssetDataCache.TryGetValue(path, out AssetData assetData))
             {
                 assetData.UpdateRefCount(1);
-                var asset = assetData.LoadAsset<T>(path);
                 if (callback != null)
-                    callback(asset);
+                    callback(assetData);
             }
             else if (MemoryManger.Instance.TryGetAssetData(path, out assetData))
             {
                 // 尝试从缓存中获取
                 assetData.UpdateRefCount(1);
                 this.m_AssetDataCache.Add(path, assetData);
-                var asset = assetData.LoadAsset<T>(path);
                 if (callback != null)
-                    callback(asset);
+                    callback(assetData);
             }
             else
             {
                 yield return this.AssetsLoader.LoadAssetIEnumerator(path, (ret) => {
-                    var asset = ret.LoadAsset<T>(path);
                     this.m_AssetDataCache.Add(path, ret);
                     ret.UpdateRefCount(1);
                     if (callback != null)
-                        callback(asset);
+                        callback(ret);
                 });
             }
 

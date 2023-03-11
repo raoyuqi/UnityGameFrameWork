@@ -173,8 +173,7 @@ namespace FrameWork.Core.Modules.Pool
         private void Free(GameObject gameObject)
         {
             var objName = gameObject.name.Replace("(Clone)", "");
-            if (UIAssetsConfig.PathConfit.TryGetValue(objName, out string path))
-                AssetsLoaderManager.Instance.FreeAsset(path);
+            ResourceManager.Instance.FreeRefCountByName(objName);
         }
     }
 }
