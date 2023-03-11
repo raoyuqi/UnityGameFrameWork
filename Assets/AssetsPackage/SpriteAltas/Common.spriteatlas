@@ -23,7 +23,7 @@ SpriteAtlas:
     platformSettings: []
     packingSettings:
       serializedVersion: 2
-      padding: 4
+      padding: 2
       blockOffset: 0
       allowAlphaSplitting: 0
       enableRotation: 0
@@ -33,37 +33,15 @@ SpriteAtlas:
     - {fileID: 21300000, guid: 7084c2bb0c7bceb42ab1d9d1634bb733, type: 3}
     - {fileID: 21300000, guid: 2993ff151ab55574386e6d75f0a204e9, type: 3}
     - {fileID: 21300000, guid: 571f4684a37a58a4585a788216bb7108, type: 3}
-    - {fileID: 21300000, guid: c9549f9da7a1abc4ba17f5485a4d0001, type: 3}
     - {fileID: 21300000, guid: c8ef11eca0b6e4248931c20ff674bbe5, type: 3}
     - {fileID: 21300000, guid: b5251646bdb1a5649bbc09eb8d8b6e83, type: 3}
     - {fileID: 21300000, guid: d8f4132e882c789448db57f455d5329f, type: 3}
     - {fileID: 21300000, guid: 14c48188668dd4d49a5ffa54ed3ebc04, type: 3}
-    - {fileID: 21300000, guid: 8992f7c4fdf413b42b39b2c1e51dfc07, type: 3}
     - {fileID: 21300000, guid: ff985c2fd33734349921b14c0131e971, type: 3}
-    totalSpriteSurfaceArea: 147564
+    totalSpriteSurfaceArea: 0
     bindAsDefault: 1
   m_MasterAtlas: {fileID: 0}
-  m_PackedSprites:
-  - {fileID: 21300000, guid: 571f4684a37a58a4585a788216bb7108, type: 3}
-  - {fileID: 21300000, guid: 8992f7c4fdf413b42b39b2c1e51dfc07, type: 3}
-  - {fileID: 21300000, guid: 2993ff151ab55574386e6d75f0a204e9, type: 3}
-  - {fileID: 21300000, guid: b5251646bdb1a5649bbc09eb8d8b6e83, type: 3}
-  - {fileID: 21300000, guid: 14c48188668dd4d49a5ffa54ed3ebc04, type: 3}
-  - {fileID: 21300000, guid: 7084c2bb0c7bceb42ab1d9d1634bb733, type: 3}
-  - {fileID: 21300000, guid: c8ef11eca0b6e4248931c20ff674bbe5, type: 3}
-  - {fileID: 21300000, guid: c9549f9da7a1abc4ba17f5485a4d0001, type: 3}
-  - {fileID: 21300000, guid: d8f4132e882c789448db57f455d5329f, type: 3}
-  - {fileID: 21300000, guid: ff985c2fd33734349921b14c0131e971, type: 3}
-  m_PackedSpriteNamesToIndex:
-  - btn_blue
-  - com_btn_yellow_4
-  - alert_lines_right
-  - com_btn_gray_3
-  - com_btn_red_3
-  - alert_lines_left
-  - btn_gray
-  - btn_close3
-  - com_btn_purple_3
-  - com_mask_bg
+  m_PackedSprites: []
+  m_PackedSpriteNamesToIndex: []
   m_Tag: Common
   m_IsVariant: 0

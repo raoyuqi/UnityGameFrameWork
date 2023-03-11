@@ -16,6 +16,8 @@ public class BuildAssetBundles
     private const string _SPRITE_ATLAS_ROOT_DIR = "SpriteAltas/";
     private const string _RELATIVE_ROOT_DIR = "Assets/AssetsPackage";
 
+    private static List<SpriteAtlas> _CREATE_ATLASES = new List<SpriteAtlas>();
+
     private static string PathCombine(params string[] paths) => string.Join(
         "/",
         paths.Where(r => !string.IsNullOrEmpty(r))
@@ -86,8 +88,13 @@ public class BuildAssetBundles
 
         var buildList = new List<AssetBundleBuild>();
         BuildAtlasAssetBundle(buildList);
-        BuildImageAssetBundle(buildList);
+
+        var path = PathCombine(_ASSETS_DIRECTORY_ROOT, "ImageStatic");
+        BuildImageAssetBundle(path, buildList);
+
         BuildPrefabAssetBundle(buildList);
+
+        SpriteAtlasUtility.PackAtlases(_CREATE_ATLASES.ToArray(), EditorUserBuildSettings.activeBuildTarget);
 
         AssetBundleBuild[] buildMap = buildList.ToArray();
         BuildPipeline.BuildAssetBundles(Application.streamingAssetsPath, buildMap, BuildAssetBundleOptions.None, BuildTarget.StandaloneWindows);
@@ -104,7 +111,8 @@ public class BuildAssetBundles
             return;
         }
 
-        BuildSpriteAtlas(path);
+        _CREATE_ATLASES.Clear();
+        BuildSpriteAtlas(PathCombine(_ASSETS_DIRECTORY_ROOT, "Arts/Atlas"), _CREATE_ATLASES);
 
         var dir = new DirectoryInfo(path);
         var files = dir.GetFiles("*", SearchOption.AllDirectories);
@@ -123,34 +131,47 @@ public class BuildAssetBundles
     }
 
     // 打包静态图片
-    private static void BuildImageAssetBundle(List<AssetBundleBuild> buildList)
+    private static void BuildImageAssetBundle(string dirPath, List<AssetBundleBuild> buildList)
     {
-        var path = PathCombine(_ASSETS_DIRECTORY_ROOT, "Temp");
-        if (!Directory.Exists(path))
+        
+        if (!Directory.Exists(dirPath))
         {
-            Debug.LogError($"文件夹不存在: path = {path}");
+            Debug.LogError($"文件夹不存在: path = {dirPath}");
             return;
         }
 
-        var dir = new DirectoryInfo(path);
-        var files = dir.GetFiles("*", SearchOption.AllDirectories);
+        var dir = new DirectoryInfo(dirPath);
+        var dirs = dir.GetDirectories();
+        if (dirs.Length == 0)
+            return;
 
-        var assetNames = new List<string>();
-        foreach (var fileInfo in files)
+        foreach (var dirInfo in dirs)
         {
-            if (fileInfo.Name.EndsWith(".meta"))
-                continue;
+            var files = dirInfo.GetFiles("*", SearchOption.TopDirectoryOnly);
+            var relativelyPath = PathTool.GetDirectoryRelativelyPath($"{_ASSETS_DIRECTORY_ROOT}/", dirInfo.FullName);
+            var assetBundleName = $"{relativelyPath}/ImageStatic.staticimages";
 
-            var name = PathTool.GetDirectoryRelativelyPath($"{_ASSETS_DIRECTORY_ROOT}/", fileInfo.FullName);
-            //Debug.Log(PathCombine(_RELATIVE_ROOT_DIR, name));
-            assetNames.Add(PathCombine(_RELATIVE_ROOT_DIR, name));
+            var nameList = new List<string>();
+            foreach (var fileInfo in files)
+            {
+                if (fileInfo.Name.EndsWith(".meta"))
+                    continue;
+
+                var name = PathTool.GetDirectoryRelativelyPath($"{_ASSETS_DIRECTORY_ROOT}/", fileInfo.FullName);
+                nameList.Add(PathTool.PathCombine(_RELATIVE_ROOT_DIR, name));
+            }
+
+            if (nameList.Count > 0)
+            {
+                buildList.Add(new AssetBundleBuild()
+                {
+                    assetBundleName = assetBundleName,
+                    assetNames = nameList.ToArray()
+                });
+            }
+
+            BuildImageAssetBundle(dirInfo.FullName, buildList);
         }
-
-        buildList.Add(new AssetBundleBuild()
-        {
-            assetBundleName = "Temp/Image/Bundle.static",
-            assetNames = assetNames.ToArray()
-        });
     }
 
     // 打包预制体
@@ -180,7 +201,7 @@ public class BuildAssetBundles
     }
 
     // 创建图集
-    private static void BuildSpriteAtlas(string dirPath)
+    private static void BuildSpriteAtlas(string dirPath, List<SpriteAtlas> atlases)
     {
         if (!Directory.Exists(dirPath))
         {
@@ -199,6 +220,7 @@ public class BuildAssetBundles
         {
             var relativelyPath = PathTool.GetDirectoryRelativelyPath(dirPath, dirInfo.FullName);
             var spriteAtlasPath = $"{PathTool.PathCombine(targetRoot, relativelyPath)}.spriteatlas";
+            AssetDatabase.DeleteAsset(spriteAtlasPath);
 
             var spriteAtlas = new SpriteAtlas();
             var packingSetting = new SpriteAtlasPackingSettings()
@@ -227,10 +249,10 @@ public class BuildAssetBundles
             {
                 spriteAtlas.Add(spriteList.ToArray());
                 AssetDatabase.CreateAsset(spriteAtlas, spriteAtlasPath);
-                SpriteAtlasUtility.PackAtlases(new[] { spriteAtlas }, EditorUserBuildSettings.activeBuildTarget);
+                atlases.Add(spriteAtlas);
             }
 
-            BuildSpriteAtlas(dirInfo.FullName);
+            BuildSpriteAtlas(dirInfo.FullName, atlases);
         }
 
         AssetDatabase.Refresh();

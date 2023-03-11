@@ -15,5 +15,10 @@ public class ApplicationManager : MonoBehaviour
     private void Awake()
     {
         AppConst.IsAssetBundle = this.IsAssetBundle;
+
+#if !UNITY_EDITOR
+        AppConst.IsAssetBundle = true;
+#endif
+        
     }
 }

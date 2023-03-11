@@ -25,17 +25,17 @@ namespace FrameWork.Core.Modules.AssetsLoader
             return this.LoadAssets(relativelyPath);
         }
 
-        public void LoadAssetsAsync(string relativelyPath, Action<AssetData> callback = null)
-        {
-            MonoBehaviourRuntime.Instance.StartCoroutine(this.LoadAssetIEnumerator(relativelyPath, callback));
-        }
+        //public void LoadAssetAsync(string relativelyPath, Action<AssetData> callback = null)
+        //{
+        //    MonoBehaviourRuntime.Instance.StartCoroutine(this.LoadAssetIEnumerator(relativelyPath, callback));
+        //}
 
-        public void LoadAssetAsync<T>(string relativelyPath, Action<AssetData> callback = null) where T : UnityEngine.Object
-        {
-            MonoBehaviourRuntime.Instance.StartCoroutine(this.LoadAssetIEnumerator(relativelyPath, callback));
-        }
+        //public void LoadAssetAsync<T>(string relativelyPath, Action<AssetData> callback = null) where T : UnityEngine.Object
+        //{
+        //    MonoBehaviourRuntime.Instance.StartCoroutine(this.LoadAssetIEnumerator(relativelyPath, callback));
+        //}
 
-        private IEnumerator LoadAssetIEnumerator(string relativelyPath, Action<AssetData> callback = null)
+        public IEnumerator LoadAssetIEnumerator(string relativelyPath, Action<AssetData> callback = null)
         {
             var path = PathTool.GetAssetAbsolutePath(relativelyPath);
             var bundleRequest = AssetBundle.LoadFromFileAsync(path);

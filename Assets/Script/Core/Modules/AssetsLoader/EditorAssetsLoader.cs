@@ -59,15 +59,23 @@ namespace FrameWork.Core.Modules.AssetsLoader
 #endif
         }
 
-        public void LoadAssetAsync<T>(string path, System.Action<AssetData> callback = null) where T : UnityObject
-        {
-            MonoBehaviourRuntime.Instance.StartCoroutine(this.LoadAssetIEnumerator<T>(path, callback));
-        }
+        //public void LoadAssetAsync<T>(string path, System.Action<AssetData> callback = null) where T : UnityObject
+        //{
+        //    MonoBehaviourRuntime.Instance.StartCoroutine(this.LoadAssetIEnumerator<T>(path, callback));
+        //}
 
         private IEnumerator LoadAssetIEnumerator<T>(string path, System.Action<AssetData> callback = null) where T : UnityObject
         {
             yield return null;
             var assets = this.LoadAssets<T>(path);
+            if (callback != null)
+                callback(assets);
+        }
+
+        public IEnumerator LoadAssetIEnumerator(string path, System.Action<AssetData> callback = null)
+        {
+            yield return null;
+            var assets = this.LoadAssets(path);
             if (callback != null)
                 callback(assets);
         }

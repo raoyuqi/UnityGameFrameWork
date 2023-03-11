@@ -23,47 +23,24 @@ SpriteAtlas:
     platformSettings: []
     packingSettings:
       serializedVersion: 2
-      padding: 4
+      padding: 2
       blockOffset: 0
       allowAlphaSplitting: 0
       enableRotation: 0
       enableTightPacking: 0
     variantMultiplier: 1
     packables:
-    - {fileID: 21300000, guid: 4a8b1ff1f49259f4ba27a52b53714eb5, type: 3}
-    - {fileID: 21300000, guid: d3b5fb6f898f5af4f8abb63eeba02de6, type: 3}
     - {fileID: 21300000, guid: 8d032bffdf3ca8f4fbec2f717a7858af, type: 3}
     - {fileID: 21300000, guid: 9f01081994ca90046928424bdb2634c7, type: 3}
     - {fileID: 21300000, guid: 99105ddebaf21734f90a200b80069b0d, type: 3}
-    - {fileID: 21300000, guid: fe8fa2069f4091f48aceefc1c0e5c0af, type: 3}
     - {fileID: 21300000, guid: f82e27951c83ac241801c07611b4df0f, type: 3}
     - {fileID: 21300000, guid: af0b3f57a59022643882d2c7244fa2b3, type: 3}
     - {fileID: 21300000, guid: 5b4c2949f7c4d8842a625545f287a76b, type: 3}
     - {fileID: 21300000, guid: bdd8fd3673393414fbfeae3d1b830480, type: 3}
-    totalSpriteSurfaceArea: 23897
+    totalSpriteSurfaceArea: 0
     bindAsDefault: 1
   m_MasterAtlas: {fileID: 0}
-  m_PackedSprites:
-  - {fileID: 21300000, guid: 4a8b1ff1f49259f4ba27a52b53714eb5, type: 3}
-  - {fileID: 21300000, guid: f82e27951c83ac241801c07611b4df0f, type: 3}
-  - {fileID: 21300000, guid: fe8fa2069f4091f48aceefc1c0e5c0af, type: 3}
-  - {fileID: 21300000, guid: bdd8fd3673393414fbfeae3d1b830480, type: 3}
-  - {fileID: 21300000, guid: af0b3f57a59022643882d2c7244fa2b3, type: 3}
-  - {fileID: 21300000, guid: 9f01081994ca90046928424bdb2634c7, type: 3}
-  - {fileID: 21300000, guid: 5b4c2949f7c4d8842a625545f287a76b, type: 3}
-  - {fileID: 21300000, guid: 99105ddebaf21734f90a200b80069b0d, type: 3}
-  - {fileID: 21300000, guid: d3b5fb6f898f5af4f8abb63eeba02de6, type: 3}
-  - {fileID: 21300000, guid: 8d032bffdf3ca8f4fbec2f717a7858af, type: 3}
-  m_PackedSpriteNamesToIndex:
-  - customer_service
-  - img_xiala
-  - img_lan
-  - img_zhanghao
-  - img_xian1
-  - img_gou
-  - img_xian2
-  - img_kuang
-  - customer_service_bg
-  - img_back
+  m_PackedSprites: []
+  m_PackedSpriteNamesToIndex: []
   m_Tag: Login
   m_IsVariant: 0

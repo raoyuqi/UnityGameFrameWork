@@ -23,7 +23,7 @@ SpriteAtlas:
     platformSettings: []
     packingSettings:
       serializedVersion: 2
-      padding: 4
+      padding: 2
       blockOffset: 0
       allowAlphaSplitting: 0
       enableRotation: 0
@@ -34,39 +34,14 @@ SpriteAtlas:
     - {fileID: 21300000, guid: 360967624555bc9488efc214077c0538, type: 3}
     - {fileID: 21300000, guid: 6bcc6ab6398080f4292e0019ecac53a7, type: 3}
     - {fileID: 21300000, guid: f1ad4d6a0ca57104d9e06bb5d243c4a8, type: 3}
-    - {fileID: 21300000, guid: 177d9d94a03e6a24888d40ad6c4bd0d3, type: 3}
-    - {fileID: 21300000, guid: 51187b5eccad7064aabea760e533f7ed, type: 3}
     - {fileID: 21300000, guid: e309dd244abc7e147bb90dcc7f63ad22, type: 3}
     - {fileID: 21300000, guid: 9d8b82468b6df3b47b42d4b7a7831af8, type: 3}
-    - {fileID: 21300000, guid: 76e8df40e1548694eb6b4cf2c1615f2c, type: 3}
     - {fileID: 21300000, guid: e496d7fdfaec982489ab2054035d3538, type: 3}
     - {fileID: 21300000, guid: a348dcb74c557904790b2e0fc130c4f5, type: 3}
-    totalSpriteSurfaceArea: 75313
+    totalSpriteSurfaceArea: 0
     bindAsDefault: 1
   m_MasterAtlas: {fileID: 0}
-  m_PackedSprites:
-  - {fileID: 21300000, guid: 76e8df40e1548694eb6b4cf2c1615f2c, type: 3}
-  - {fileID: 21300000, guid: 360967624555bc9488efc214077c0538, type: 3}
-  - {fileID: 21300000, guid: e309dd244abc7e147bb90dcc7f63ad22, type: 3}
-  - {fileID: 21300000, guid: 177d9d94a03e6a24888d40ad6c4bd0d3, type: 3}
-  - {fileID: 21300000, guid: 9d8b82468b6df3b47b42d4b7a7831af8, type: 3}
-  - {fileID: 21300000, guid: 6bcc6ab6398080f4292e0019ecac53a7, type: 3}
-  - {fileID: 21300000, guid: a348dcb74c557904790b2e0fc130c4f5, type: 3}
-  - {fileID: 21300000, guid: f1ad4d6a0ca57104d9e06bb5d243c4a8, type: 3}
-  - {fileID: 21300000, guid: 4faa457db60bab24795b16a9e2f2cd96, type: 3}
-  - {fileID: 21300000, guid: e496d7fdfaec982489ab2054035d3538, type: 3}
-  - {fileID: 21300000, guid: 51187b5eccad7064aabea760e533f7ed, type: 3}
-  m_PackedSpriteNamesToIndex:
-  - img_minute
-  - close_menu
-  - img_hour
-  - img_facebook
-  - img_input_di
-  - custom_bg
-  - level_bg
-  - grade_bg
-  - chat_frame_bg
-  - img_sign_bg
-  - img_google
+  m_PackedSprites: []
+  m_PackedSpriteNamesToIndex: []
   m_Tag: Main
   m_IsVariant: 0
