@@ -2,10 +2,11 @@
 using FrameWork.Core.Modules.Pool;
 using FrameWork.Core.Modules.Signal;
 using FrameWork.Core.Modules.UI;
+using Game.Config;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace FrameWork.Core.Manager
+namespace FrameWork.Core.SingletonManager
 {
     /// <summary>
     /// 单例UI管理器
@@ -31,15 +32,15 @@ namespace FrameWork.Core.Manager
 
         private IGameObjectPool m_GameObjectPool;
         private UISignalSystem m_UISignalSystem;
-        private AssetsLoaderManager m_AssetsLoaderManager;
+        private ResourceManager m_ResourceManager;
         private UILayerManager m_UILayerManager;
 
         public UIManager()
         {
             this.m_UISignalSystem = UISignalSystem.Instance;
-            this.m_AssetsLoaderManager = AssetsLoaderManager.Instance;
+            this.m_ResourceManager = ResourceManager.Instance;
             this.m_UILayerManager = GameObject.Find(UI_MANAGER_ROOT_NAME).GetComponent<UILayerManager>();
-            this.m_GameObjectPool = new DefaultGameObjectPool();
+            this.m_GameObjectPool = AppConst.UIGameObjectPool;
         }
 
         #region 管理独占UI
@@ -76,7 +77,7 @@ namespace FrameWork.Core.Manager
             }
 
             var fullPath = UIAssetsConfig.PathConfit[panelName];
-            this.m_AssetsLoaderManager.LoadAssetAsync<GameObject>(fullPath, (prefab) =>
+            this.m_ResourceManager.LoadAsync<GameObject>(fullPath, (prefab) =>
             {
                 var panel = this.CreateUIPanel(prefab, panelName);
                 this.m_UISignalSystem.RaiseSignal(UISignal.OnOpen, panel);
@@ -207,7 +208,7 @@ namespace FrameWork.Core.Manager
             }
 
             var fullPath = UIAssetsConfig.PathConfit[popupName];
-            this.m_AssetsLoaderManager.LoadAssetAsync<GameObject>(fullPath, (prefab) =>
+            this.m_ResourceManager.LoadAsync<GameObject>(fullPath, (prefab) =>
             {
                 var popup = this.CreateUIPanel(prefab, popupName);
                 this.m_UISignalSystem.RaiseSignal(UISignal.OnOpen, popup);

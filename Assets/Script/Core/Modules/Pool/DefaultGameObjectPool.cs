@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FrameWork.Core.SingletonManager;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -113,9 +114,8 @@ namespace FrameWork.Core.Modules.Pool
                 return;
             }
 
+            this.Free(gameObject);
             UnityEngine.Object.Destroy(gameObject);
-            // 考虑是否触发回调
-            // TODO: 删除引用计数
         }
 
         /// <summary>
@@ -127,10 +127,9 @@ namespace FrameWork.Core.Modules.Pool
             {
                 while (item.Value.Count > 0)
                 {
-                    var go = item.Value.Dequeue();
-                    UnityEngine.Object.Destroy(go);
-                    // 考虑是否触发回调
-                    // TODO: 删除引用计数
+                    var gameObject = item.Value.Dequeue();
+                    this.Free(gameObject);
+                    UnityEngine.Object.Destroy(gameObject);
                 }
             }
             this.m_RecyclePool.Clear();
@@ -146,10 +145,9 @@ namespace FrameWork.Core.Modules.Pool
             {
                 while (pool.Count > 0)
                 {
-                    var go = pool.Dequeue();
-                    UnityEngine.Object.Destroy(go);
-                    // 考虑是否触发回调
-                    // TODO: 删除引用计数
+                    var gameObject = pool.Dequeue();
+                    this.Free(gameObject);
+                    UnityEngine.Object.Destroy(gameObject);
                 }
             }
             this.m_RecyclePool.Remove(poolName);
@@ -170,6 +168,12 @@ namespace FrameWork.Core.Modules.Pool
                 return false;
 
             return this.m_RecyclePool[poolName].Contains(gameObject);
+        }
+
+        private void Free(GameObject gameObject)
+        {
+            var objName = gameObject.name.Replace("(Clone)", "");
+            ResourceManager.Instance.FreeRefCountByName(objName);
         }
     }
 }

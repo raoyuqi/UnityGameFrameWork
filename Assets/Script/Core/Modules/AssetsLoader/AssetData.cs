@@ -15,7 +15,8 @@ namespace FrameWork.Core.Modules.AssetsLoader
         private UnityObject[] m_Objects;
         private AssetBundle m_AssetBundle;
 
-        public int m_RefCount { get; private set; }
+        private int m_RefCount;
+        public int RefCount { get { return this.m_RefCount; } }
 
         public AssetData(string assetPath, UnityObject[] objects, AssetBundle assetBundle = null)
         {
@@ -58,7 +59,10 @@ namespace FrameWork.Core.Modules.AssetsLoader
         {
             this.m_RefCount += count;
             if (this.m_RefCount < 0)
+            {
+                this.m_RefCount = 0;
                 Debug.LogError($"异常：资源引用计数为负数, AssetPath = {this.m_AssetPath}, RefCount = {this.m_RefCount}");
+            }
         }
 
         public UnityObject LoadAsset(string name)
