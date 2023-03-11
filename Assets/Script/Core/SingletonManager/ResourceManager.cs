@@ -1,10 +1,11 @@
-﻿using FrameWork.Core.Mixin;
+﻿using FrameWork.Core.AssetsLoader;
+using FrameWork.Core.Mixin;
 using System;
 using UnityEngine;
 using UnityEngine.U2D;
 using UnityObject = UnityEngine.Object;
 
-namespace FrameWork.Core.Manager
+namespace FrameWork.Core.SingletonManager
 {
     public class ResourceManager : SingletonBase<ResourceManager>
     {
@@ -12,7 +13,7 @@ namespace FrameWork.Core.Manager
 
         public ResourceManager()
         {
-            this.m_AssetsLoaderManager = AssetsLoaderManager.Instance;
+            this.m_AssetsLoaderManager = new AssetsLoaderManager();
         }
 
         public UnityObject Load(string path)

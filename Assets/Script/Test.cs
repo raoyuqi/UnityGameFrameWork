@@ -1,8 +1,8 @@
-﻿using FrameWork.Core.Manager;
-using FrameWork.Core.Mathf_;
+﻿using FrameWork.Core.Mathf_;
 using FrameWork.Core.Modules.AssetsLoader;
 using FrameWork.Core.Modules.Signal;
 using FrameWork.Core.Modules.UI;
+using FrameWork.Core.SingletonManager;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -22,10 +22,6 @@ public class Test : MonoBehaviour
     void Start()
     {
         UIManager.Instance.OpenPanel<LoginPanel>();
-        //var prefab = AssetsLoaderManager.Instance.LoadAssets<GameObject>("UI/Prefabs/Login/LoginPanel.prefab");
-        //Debug.Log(prefab.name);
-        //var go = GameObject.Instantiate(prefab, this.gameObject.transform);
-        //Debug.Log(go.name + go.GetInstanceID());
 
         //var UILayerManager = GameObject.Find("UIManager").GetComponent<UILayerManager>();
         //UILayerManager.SetLayer(go.GetComponent<UIPanelBase>());

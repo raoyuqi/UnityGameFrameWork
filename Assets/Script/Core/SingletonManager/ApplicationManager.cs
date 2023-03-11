@@ -1,14 +1,11 @@
 ﻿using FrameWork.Core.Attributes;
-using FrameWork.Core.Manager;
 using FrameWork.Core.Modules.Pool;
+using FrameWork.Core.SingletonManager;
 using Game.Config;
 using UnityEngine;
 
 public class ApplicationManager : MonoBehaviour
 {
-    // 资源管理器
-    public static AssetsLoaderManager AssetsLoaderManager;
-
     [SerializeField, LabelText("使用AssetBundle")]
     private bool IsAssetBundle;
 

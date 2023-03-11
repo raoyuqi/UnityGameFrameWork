@@ -6,7 +6,7 @@ using Game.Config;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace FrameWork.Core.Manager
+namespace FrameWork.Core.SingletonManager
 {
     /// <summary>
     /// 单例UI管理器

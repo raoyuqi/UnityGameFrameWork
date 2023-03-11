@@ -1,7 +1,5 @@
-﻿using FrameWork.Core.Manager;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine.Events;
-using static FrameWork.Core.Manager.MemoryManger;
 
 namespace FrameWork.Core.Mathf_
 {

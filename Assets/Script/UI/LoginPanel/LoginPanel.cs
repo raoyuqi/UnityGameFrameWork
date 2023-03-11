@@ -1,5 +1,5 @@
-﻿using FrameWork.Core.Manager;
-using FrameWork.Core.Modules.UI;
+﻿using FrameWork.Core.Modules.UI;
+using FrameWork.Core.SingletonManager;
 using FrameWork.Core.Utils;
 using System.IO;
 using UnityEngine;

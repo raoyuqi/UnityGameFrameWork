@@ -1,10 +1,9 @@
-﻿using FrameWork.Core.Mixin;
-using System.IO;
+﻿using System.IO;
 using UnityEngine;
 
-namespace FrameWork.Core.Manager
+namespace FrameWork.Core.AssetsLoader
 {
-    public sealed class ManifestManager : SingletonBase<ManifestManager>
+    public sealed class ManifestManager
     {
         private AssetBundle m_MainAssetBundle;
         private AssetBundleManifest m_AssetBundleManifest;

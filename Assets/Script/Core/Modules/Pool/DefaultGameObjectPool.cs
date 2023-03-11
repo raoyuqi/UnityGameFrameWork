@@ -1,4 +1,4 @@
-﻿using FrameWork.Core.Manager;
+﻿using FrameWork.Core.SingletonManager;
 using System;
 using System.Collections.Generic;
 using UnityEngine;

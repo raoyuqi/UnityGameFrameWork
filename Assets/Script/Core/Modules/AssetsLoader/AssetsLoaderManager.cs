@@ -1,16 +1,18 @@
-﻿using FrameWork.Core.Mixin;
+﻿using FrameWork.Core.Manager;
 using FrameWork.Core.Modules.AssetsLoader;
+using FrameWork.Core.SingletonManager;
 using Game.Config;
 using System.Collections;
 using System.Collections.Generic;
 using UnityObject = UnityEngine.Object;
 
-namespace FrameWork.Core.Manager
+namespace FrameWork.Core.AssetsLoader
 {
-    // TODO: 更新引用计数，资源卸载，加载依赖
-    public sealed class AssetsLoaderManager : SingletonBase<AssetsLoaderManager>
+    public sealed class AssetsLoaderManager
     {
-        private Dictionary<string, AssetData> m_AssetDataCache = new Dictionary<string, AssetData>();
+        private Dictionary<string, AssetData> m_AssetDataCache;
+
+        private ManifestManager m_ManifestManager;
 
         private IAssetsLoader m_AssetsLoader;
         public IAssetsLoader AssetsLoader
@@ -27,6 +29,12 @@ namespace FrameWork.Core.Manager
 
                 return this.m_AssetsLoader;
             }
+        }
+
+        public AssetsLoaderManager()
+        {
+            this.m_AssetDataCache = new Dictionary<string, AssetData>();
+            this.m_ManifestManager = new ManifestManager();
         }
 
         public AssetData LoadAsset(string path)
@@ -94,7 +102,7 @@ namespace FrameWork.Core.Manager
         {
             if (AppConst.IsAssetBundle)
             {
-                var dependencies = ManifestManager.Instance.GetAssetBundleDependencies(relativelyPath);
+                var dependencies = this.m_ManifestManager.GetAssetBundleDependencies(relativelyPath);
                 foreach (var bundleName in dependencies)
                     this.LoadAsset(bundleName);
             }
@@ -135,7 +143,7 @@ namespace FrameWork.Core.Manager
         {
             if (AppConst.IsAssetBundle)
             {
-                var dependencies = ManifestManager.Instance.GetAssetBundleDependencies(path);
+                var dependencies = this.m_ManifestManager.GetAssetBundleDependencies(path);
                 foreach (var bundleName in dependencies)
                     yield return this.LoadAssetIEnumerator<T>(bundleName);
             }
