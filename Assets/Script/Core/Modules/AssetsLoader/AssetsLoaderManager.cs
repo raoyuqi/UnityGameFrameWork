@@ -86,6 +86,8 @@ namespace FrameWork.Core.AssetsLoader
 
         public void FreeAsset(string path)
         {
+            this.FreeDependencies(path);
+
             if (this.m_AssetDataCache.TryGetValue(path, out AssetData assetData))
             {
                 assetData.UpdateRefCount(-1);
@@ -146,6 +148,16 @@ namespace FrameWork.Core.AssetsLoader
                 var dependencies = this.m_ManifestManager.GetAssetBundleDependencies(path);
                 foreach (var bundleName in dependencies)
                     yield return this.LoadAssetIEnumerator<T>(bundleName);
+            }
+        }
+
+        private void FreeDependencies(string relativelyPath)
+        {
+            if (AppConst.IsAssetBundle)
+            {
+                var dependencies = this.m_ManifestManager.GetAssetBundleDependencies(relativelyPath);
+                foreach (var bundleName in dependencies)
+                    this.FreeAsset(bundleName);
             }
         }
     }
