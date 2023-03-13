@@ -3,6 +3,7 @@ using FrameWork.Core.Modules.AssetsLoader;
 using FrameWork.Core.Modules.Signal;
 using FrameWork.Core.Modules.UI;
 using FrameWork.Core.SingletonManager;
+using FrameWork.Core.Utils;
 using MiniJSON;
 using System.Collections;
 using System.Collections.Generic;
@@ -127,13 +128,17 @@ public class Test : MonoBehaviour
         {
             var jsonStr = Json.Serialize(dic);
 
-            var obj = Json.Deserialize(jsonStr) as List<object>;
-            foreach (var item in obj)
+
+            if (JsonUtil.TryDeserializeToListDictionary(jsonStr, out List<Dictionary<string, string>> ret))
             {
-                var o = item as Dictionary<string, object>;
-                UnityEngine.Debug.Log(o["name"] + "   " + o["md5"] + "   " + o["path"]);
+                UnityEngine.Debug.Log("---------------------------------");
+                foreach (var item in ret)
+                {
+                    UnityEngine.Debug.Log(item["name"] + "   " + item["md5"] + "   " + item["path"]);
+                }
+
+                UnityEngine.Debug.Log("jsonStr" + "   " + Json.Serialize(ret));
             }
-            UnityEngine.Debug.Log("jsonStr" + "   " + jsonStr);
         }
         watch.Stop();
         UnityEngine.Debug.Log("SimpleJson Parse Time(ms):" + watch.ElapsedMilliseconds);
