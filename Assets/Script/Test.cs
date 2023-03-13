@@ -3,8 +3,10 @@ using FrameWork.Core.Modules.AssetsLoader;
 using FrameWork.Core.Modules.Signal;
 using FrameWork.Core.Modules.UI;
 using FrameWork.Core.SingletonManager;
+using MiniJSON;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using UnityEngine;
 
 public class Data
@@ -29,22 +31,22 @@ public class Test : MonoBehaviour
         UISignalSystem uISignalSystem = UISignalSystem.Instance;
         uISignalSystem.RegisterSignal(UISignal.OnOpened, (uIPanel, args) =>
         {
-            Debug.Log("打开完成 " + uIPanel.name);
+            UnityEngine.Debug.Log("打开完成 " + uIPanel.name);
         });
 
         uISignalSystem.RegisterSignal(UISignal.initialized, (uIPanel, args) =>
         {
-            Debug.Log("初始化完成 " + uIPanel.name);
+            UnityEngine.Debug.Log("初始化完成 " + uIPanel.name);
         });
 
 
         uISignalSystem.RegisterSignal(UISignal.OnOpen, (uIPanel, args) =>
         {
-            Debug.Log("正在打开界面 " + uIPanel.name);
+            UnityEngine.Debug.Log("正在打开界面 " + uIPanel.name);
         });
 
         //this.StartCoroutine(this.TestMethod(go));
-        Debug.Log("********************************");
+        UnityEngine.Debug.Log("********************************");
 
         LRUCache<Data> cache = new LRUCache<Data>(2);
         var d1 = new Data(1);
@@ -58,7 +60,7 @@ public class Test : MonoBehaviour
 
         cache.FreeOldestNodeCallBack += ((data) =>
         {
-            Debug.Log("释放 ： " + data + " value = " + data.Value);
+            UnityEngine.Debug.Log("释放 ： " + data + " value = " + data.Value);
         });
         cache.Put("1", d1);
         cache.Put("2", d2);
@@ -69,8 +71,8 @@ public class Test : MonoBehaviour
         var assetData1 = cache.Get("2");
 
 
-        Debug.Log(assetData);
-        Debug.Log(assetData1);
+        UnityEngine.Debug.Log(assetData);
+        UnityEngine.Debug.Log(assetData1);
 
         cache.Clean();
         cache.Put("1", d3);
@@ -82,8 +84,8 @@ public class Test : MonoBehaviour
         assetData1 = cache.Get("2");
 
 
-        Debug.Log(assetData.Value);
-        Debug.Log(assetData1);
+        UnityEngine.Debug.Log(assetData.Value);
+        UnityEngine.Debug.Log(assetData1);
         //Debug.Log(cache.Size);
         //cache.Put("1", "a");
         //cache.Put("2", "b");
@@ -101,5 +103,39 @@ public class Test : MonoBehaviour
         //cache.Put("10", "k");
         //Debug.Log(s + s1);
         //Debug.Log(cache.Size);
+
+        //string jsonStr = "{\"id\":10001,\"name\":\"test\"}";
+
+        var dic = new List<Dictionary<string, string>>();
+        dic.Add(new Dictionary<string, string>()
+            {
+                { "name", "file1" },{ "md5", "xxx1" },{ "path", "xxxpath" }
+            });
+        dic.Add(new Dictionary<string, string>()
+            {
+                { "name", "file2" },{ "md5", "xxx2" },{ "path", "xxxpath2" }
+            });
+        dic.Add(new Dictionary<string, string>()
+            {
+                { "name", "file3" },{ "md5", "xxx3" },{ "path", "xxxpath3" }
+            });
+
+        var watch = new Stopwatch();
+        watch.Reset();
+        watch.Start();
+        for (int i = 0; i < 2; i++)
+        {
+            var jsonStr = Json.Serialize(dic);
+
+            var obj = Json.Deserialize(jsonStr) as List<object>;
+            foreach (var item in obj)
+            {
+                var o = item as Dictionary<string, object>;
+                UnityEngine.Debug.Log(o["name"] + "   " + o["md5"] + "   " + o["path"]);
+            }
+            UnityEngine.Debug.Log("jsonStr" + "   " + jsonStr);
+        }
+        watch.Stop();
+        UnityEngine.Debug.Log("SimpleJson Parse Time(ms):" + watch.ElapsedMilliseconds);
     }
 }
