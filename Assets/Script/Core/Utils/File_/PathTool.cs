@@ -21,7 +21,7 @@ namespace FrameWork.Core.Utils
             if (AppConst.IsAssetBundle)
             {
                 path.Append(Application.streamingAssetsPath)
-                    .Append("/")
+                    .Append("/AssetBundle/")
                     .Append(relativelyPath);
             }
             else
@@ -43,7 +43,12 @@ namespace FrameWork.Core.Utils
         /// <returns></returns>
         public static string GetAssetsBundlePersistentPath()
         {
-            return Application.persistentDataPath + "/Resources/";
+            return Application.persistentDataPath + "/AssetBundle/";
+        }
+
+        public static string GetAssetsBundleStreamingPath()
+        {
+            return Application.streamingAssetsPath + "/AssetBundle/";
         }
 
         /// <summary>
