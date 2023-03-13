@@ -8,6 +8,7 @@ using MiniJSON;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using UnityEngine;
 
 public class Data
@@ -142,5 +143,9 @@ public class Test : MonoBehaviour
         }
         watch.Stop();
         UnityEngine.Debug.Log("SimpleJson Parse Time(ms):" + watch.ElapsedMilliseconds);
+        UnityEngine.Debug.Log(PathTool.GetAssetsBundlePersistentPath());
+        //FileInfo fileInfo = new FileInfo(Application.dataPath + "/AssetsPackage/Prefabs/Login/LoginPanel.prefab");
+        //UnityEngine.Debug.Log(MD5Util.GetFileInfoMD5(fileInfo));
+        //UnityEngine.Debug.Log(MD5Util.GetFileInfoMD5(fileInfo));
     }
 }
