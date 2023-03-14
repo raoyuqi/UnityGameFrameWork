@@ -28,7 +28,7 @@ namespace FrameWork.Core.Utils
             return true;
         }
 
-        public static bool DeserializeToDictionary(string json, out Dictionary<string, string> ret)
+        public static bool TryDeserializeToDictionary(string json, out Dictionary<string, string> ret)
         {
             ret = default;
             var dic = Json.Deserialize(json) as Dictionary<string, object>;

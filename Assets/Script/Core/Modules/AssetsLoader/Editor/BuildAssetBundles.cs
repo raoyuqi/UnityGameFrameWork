@@ -29,26 +29,29 @@ public class BuildAssetBundles
     [MenuItem("自定义工具/Build Asset Bundles")]
     public static void Build()
     {
-        var buildList = new List<AssetBundleBuild>();
-        BuildAtlasAssetBundle(buildList);
+        //var buildList = new List<AssetBundleBuild>();
+        //BuildAtlasAssetBundle(buildList);
 
-        var path = PathCombine(_ASSETS_DIRECTORY_ROOT, "ImageStatic");
-        BuildImageAssetBundle(path, buildList);
+        //var path = PathCombine(_ASSETS_DIRECTORY_ROOT, "ImageStatic");
+        //BuildImageAssetBundle(path, buildList);
 
-        BuildPrefabAssetBundle(buildList);
+        //BuildPrefabAssetBundle(buildList);
 
-        SpriteAtlasUtility.PackAtlases(_CREATE_ATLASES.ToArray(), EditorUserBuildSettings.activeBuildTarget);
+        //SpriteAtlasUtility.PackAtlases(_CREATE_ATLASES.ToArray(), EditorUserBuildSettings.activeBuildTarget);
 
-        AssetBundleBuild[] buildMap = buildList.ToArray();
-        BuildPipeline.BuildAssetBundles(
-            Application.streamingAssetsPath + "/AssetBundle",
-            buildMap,
-            BuildAssetBundleOptions.None,
-            BuildTarget.StandaloneWindows
-        );
+        //AssetBundleBuild[] buildMap = buildList.ToArray();
+        //BuildPipeline.BuildAssetBundles(
+        //    Application.streamingAssetsPath + "/AssetBundle",
+        //    buildMap,
+        //    BuildAssetBundleOptions.None,
+        //    BuildTarget.StandaloneWindows
+        //);
+
+        GenerateVersionFile();
+
+        GenerateResourceListFile();
+
         AssetDatabase.Refresh();
-
-        GenerateResourceList();
     }
 
     // 打包图集
@@ -209,7 +212,7 @@ public class BuildAssetBundles
     }
 
     // 生成资源清单
-    private static void GenerateResourceList()
+    private static void GenerateResourceListFile()
     {
         var directoryInfo = new DirectoryInfo(Application.streamingAssetsPath);
         if (directoryInfo == null)
@@ -241,6 +244,50 @@ public class BuildAssetBundles
         {
             var info = new UTF8Encoding(true).GetBytes(json);
             fs.Write(info, 0, info.Length);
+        }        
+    }
+
+    // 生成版本文件
+    private static void GenerateVersionFile()
+    {
+        var appVersion = PlayerSettings.bundleVersion;
+        var filePath = $"{ PathTool.GetAssetsBundleStreamingPath() }AppVersion.json";
+        if (!File.Exists(filePath))
+        {
+            var versionJson = Json.Serialize(new Dictionary<string, string>() {
+                { "app_version", appVersion }
+            });
+            using (var fs = File.OpenWrite(filePath))
+            {
+                var info = new UTF8Encoding(true).GetBytes(versionJson);
+                fs.Write(info, 0, info.Length);
+            }
         }
+        else
+        {
+            var jsonContent = File.ReadAllText(filePath);
+            if(JsonUtil.TryDeserializeToDictionary(jsonContent, out Dictionary<string, string> dic))
+            {
+                var version = dic["app_version"];
+                var versionArr = version.Split('.');
+                var nextVersion = int.Parse(versionArr[2]) + 1;
+                var newVersion = $"{versionArr[0]}.{versionArr[1]}.{nextVersion}";
+                dic["app_version"] = newVersion;
+
+                // 全部覆盖写入
+                using (var fs = File.OpenWrite(filePath))
+                {
+                    var versionJson = Json.Serialize(dic);
+                    var info = new UTF8Encoding(true).GetBytes(versionJson);
+                    fs.Write(info, 0, info.Length);
+                }
+            }
+        }
+    }
+
+    // 将热更资源上传到远端
+    private static void SubmitToRemote()
+    {
+        // TODO: 
     }
 }

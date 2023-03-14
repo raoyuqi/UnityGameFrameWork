@@ -10,5 +10,7 @@ namespace Game.Config
 
         // UI使用的对象池
         public static IGameObjectPool UIGameObjectPool;
+
+        public static string AppVersionKey = "app_version";
     }
 }

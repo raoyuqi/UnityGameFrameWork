@@ -9,6 +9,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Text;
+using UnityEditor;
 using UnityEngine;
 
 public class Data
@@ -147,5 +149,23 @@ public class Test : MonoBehaviour
         //FileInfo fileInfo = new FileInfo(Application.dataPath + "/AssetsPackage/Prefabs/Login/LoginPanel.prefab");
         //UnityEngine.Debug.Log(MD5Util.GetFileInfoMD5(fileInfo));
         //UnityEngine.Debug.Log(MD5Util.GetFileInfoMD5(fileInfo));
+
+        //UnityEngine.Debug.Log(Directory.Exists("E:/MyTest/AssetBundle"));
+        //if (!Directory.Exists("E:/MyTest/AssetBundle"))
+        //{
+        //    Directory.CreateDirectory("E:/MyTest/AssetBundle");
+        //}
+        //else
+        //{
+        //    Directory.Delete("E:/MyTest", true);
+        //}
+
+        //using (FileStream fs = File.OpenWrite("E:/MyTest/AssetBundle/111.txt"))
+        //{            
+        //    var info = new UTF8Encoding(true).GetBytes("ajkfhjak放假啊开始加快老大");
+        //    fs.Write(info, 0, info.Length);
+        //}
+
+        UnityEngine.Debug.Log(Application.version);
     }
 }
