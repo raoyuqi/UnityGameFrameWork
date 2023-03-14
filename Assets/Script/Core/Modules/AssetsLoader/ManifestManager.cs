@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using FrameWork.Core.Utils;
+using System.IO;
 using UnityEngine;
 
 namespace FrameWork.Core.AssetsLoader
@@ -11,7 +12,9 @@ namespace FrameWork.Core.AssetsLoader
         public ManifestManager()
         {
             // TODO: 沙盒路径persistentDataPath
-            this.m_MainAssetBundle = AssetBundle.LoadFromFile(Path.Combine(Application.streamingAssetsPath, "StreamingAssets"));
+            this.m_MainAssetBundle = AssetBundle.LoadFromFile(
+                Path.Combine(PathTool.GetAssetsBundleStreamingPath(), "AssetBundle")
+            );
             if (this.m_MainAssetBundle != null)
                 this.m_AssetBundleManifest = this.m_MainAssetBundle.LoadAsset<AssetBundleManifest>("AssetBundleManifest");
         }

@@ -21,7 +21,7 @@ namespace FrameWork.Core.Utils
             if (AppConst.IsAssetBundle)
             {
                 path.Append(Application.streamingAssetsPath)
-                    .Append("/")
+                    .Append("/AssetBundle/")
                     .Append(relativelyPath);
             }
             else
@@ -38,6 +38,20 @@ namespace FrameWork.Core.Utils
         }
 
         /// <summary>
+        /// 热更资源存放在Application.persistentDataPath+"/Resources/"目录下
+        /// </summary>
+        /// <returns></returns>
+        public static string GetAssetsBundlePersistentPath()
+        {
+            return Application.persistentDataPath + "/AssetBundle/";
+        }
+
+        public static string GetAssetsBundleStreamingPath()
+        {
+            return Application.streamingAssetsPath + "/AssetBundle/";
+        }
+
+        /// <summary>
         /// 获取目录文件相对路径
         /// </summary>
         /// <param name="directoryPath">文件夹路径</param>
@@ -49,7 +63,6 @@ namespace FrameWork.Core.Utils
             fullName = fullName.Replace(@"\", "/");
             return fullName.Replace(directoryPath, "");
         }
-
 
         public static string PathCombine(params string[] paths) => string.Join(
             "/",

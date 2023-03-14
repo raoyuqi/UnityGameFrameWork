@@ -1,8 +1,10 @@
 ﻿using FrameWork.Core.Utils;
+using MiniJSON;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using UnityEditor;
 using UnityEditor.Sprites;
 using UnityEditor.U2D;
@@ -11,6 +13,7 @@ using UnityEngine.U2D;
 
 public class BuildAssetBundles
 {
+    private static string _STREAMING_ASSETS_PATH_ROOT = $"{Application.streamingAssetsPath}/";
     private static string _ASSETS_DIRECTORY_ROOT = PathCombine(Application.dataPath, "AssetsPackage");
     private const string _PREFABS_ROOT_DIR = "Prefabs/";
     private const string _SPRITE_ATLAS_ROOT_DIR = "SpriteAltas/";
@@ -26,78 +29,28 @@ public class BuildAssetBundles
     [MenuItem("自定义工具/Build Asset Bundles")]
     public static void Build()
     {
-        // Create the array of bundle build details.
-        //AssetBundleBuild[] buildMap = new AssetBundleBuild[2];
-        //List<AssetBundleBuild> buildList = new List<AssetBundleBuild>();
+        //var buildList = new List<AssetBundleBuild>();
+        //BuildAtlasAssetBundle(buildList);
 
-        //buildMap[0].assetBundleName = "atlastestbundle";
+        //var path = PathCombine(_ASSETS_DIRECTORY_ROOT, "ImageStatic");
+        //BuildImageAssetBundle(path, buildList);
 
-        //string[] assets = new string[] { };
-        //enemyAssets[0] = "Assets/Textures/char_enemy_alienShip.jpg";
-        //enemyAssets[1] = "Assets/Textures/char_enemy_alienShip-damaged.jpg";
+        //BuildPrefabAssetBundle(buildList);
 
-        //buildMap[0].assetNames = enemyAssets;
-        //buildMap[1].assetBundleName = "herobundle";
+        //SpriteAtlasUtility.PackAtlases(_CREATE_ATLASES.ToArray(), EditorUserBuildSettings.activeBuildTarget);
 
-        //string[] heroAssets = new string[1];
-        //heroAssets[0] = "char_hero_beanMan";
-        //buildMap[1].assetNames = heroAssets;
+        //AssetBundleBuild[] buildMap = buildList.ToArray();
+        //BuildPipeline.BuildAssetBundles(
+        //    Application.streamingAssetsPath + "/AssetBundle",
+        //    buildMap,
+        //    BuildAssetBundleOptions.None,
+        //    BuildTarget.StandaloneWindows
+        //);
 
-        //var root = "Assets/Resources/Atlas/Test/";
-        //buildMap[0].assetBundleName = "atlas/test/bundle";
-        //List<string> assets = new List<string>();
-        //DirectoryInfo dir = new DirectoryInfo(Application.dataPath + "/Resources/Atlas/Test");
-        //FileInfo[] files = dir.GetFiles("*", SearchOption.AllDirectories);
-        //foreach (var fileInfo in files)
-        //{
-        //    if (fileInfo.Name.EndsWith(".meta"))
-        //        continue;
+        GenerateVersionFile();
 
-        //    assets.Add(root + fileInfo.Name);
-        //    Debug.Log(root + fileInfo.Name);
-        //}
+        GenerateResourceListFile();
 
-        //buildMap[0].assetNames = assets.ToArray();
-
-        //buildMap[1].assetBundleName = "prefab/test/bundle";
-        //string[] heroAssets = new string[1];
-        //heroAssets[0] = "Assets/Resources/Prefab/Test/Test.prefab";
-        //buildMap[1].assetNames = heroAssets;
-
-        //BuildPipeline.BuildAssetBundles(Application.streamingAssetsPath, buildMap, BuildAssetBundleOptions.None, BuildTarget.StandaloneWindows);
-
-        // 加载逻辑
-        //var path = Path.Combine(Application.streamingAssetsPath, "prefab/test/bundle");
-        //var ab1 = AssetBundle.LoadFromFile(Path.Combine(Application.streamingAssetsPath, "atlas/test/bundle"));
-        //var ab = AssetBundle.LoadFromFile(path);
-        //var prefab = ab.LoadAsset<GameObject>("Test.prefab");
-        //Debug.Log(prefab);
-        //Debug.Log(ab);
-        //GameObject.Instantiate(prefab, GameObject.Find("Canvas").transform);
-
-        //var asset1 = ab1.LoadAsset<Sprite>("img_toggle_selected.png");
-        //var asset2 = ab1.LoadAllAssets<Sprite>();
-
-        //foreach (var item in asset2)
-        //{
-        //    Debug.Log(item.name);
-        //}
-
-        //Debug.Log(asset2);
-        //Debug.Log("***************** ");
-
-        var buildList = new List<AssetBundleBuild>();
-        BuildAtlasAssetBundle(buildList);
-
-        var path = PathCombine(_ASSETS_DIRECTORY_ROOT, "ImageStatic");
-        BuildImageAssetBundle(path, buildList);
-
-        BuildPrefabAssetBundle(buildList);
-
-        SpriteAtlasUtility.PackAtlases(_CREATE_ATLASES.ToArray(), EditorUserBuildSettings.activeBuildTarget);
-
-        AssetBundleBuild[] buildMap = buildList.ToArray();
-        BuildPipeline.BuildAssetBundles(Application.streamingAssetsPath, buildMap, BuildAssetBundleOptions.None, BuildTarget.StandaloneWindows);
         AssetDatabase.Refresh();
     }
 
@@ -256,5 +209,85 @@ public class BuildAssetBundles
         }
 
         AssetDatabase.Refresh();
+    }
+
+    // 生成资源清单
+    private static void GenerateResourceListFile()
+    {
+        var directoryInfo = new DirectoryInfo(Application.streamingAssetsPath);
+        if (directoryInfo == null)
+            return;
+
+        var list = new List<Dictionary<string, string>>();
+        var files = directoryInfo.GetFiles("*", SearchOption.AllDirectories);
+        foreach (var file in files)
+        {
+            if (file.Name.EndsWith(".meta"))
+                continue;
+
+            var fileAttributes = File.GetAttributes(file.FullName);
+            if (fileAttributes == FileAttributes.Directory)
+                continue;
+
+            var filePath = PathTool.GetDirectoryRelativelyPath(_STREAMING_ASSETS_PATH_ROOT, file.FullName);
+            var dirPath = PathTool.GetDirectoryRelativelyPath(_STREAMING_ASSETS_PATH_ROOT, file.DirectoryName);
+            list.Add(new Dictionary<string, string>() {
+                { "dir", dirPath },
+                { "file", filePath },
+                { "md5", MD5Util.GetFileInfoMD5(file) },
+            });
+        }
+
+        var json = Json.Serialize(list);
+        var resFilePath = $"{ PathTool.GetAssetsBundleStreamingPath() }ResourceList.json";
+        using (FileStream fs = File.OpenWrite(resFilePath))
+        {
+            var info = new UTF8Encoding(true).GetBytes(json);
+            fs.Write(info, 0, info.Length);
+        }        
+    }
+
+    // 生成版本文件
+    private static void GenerateVersionFile()
+    {
+        var appVersion = PlayerSettings.bundleVersion;
+        var filePath = $"{ PathTool.GetAssetsBundleStreamingPath() }AppVersion.json";
+        if (!File.Exists(filePath))
+        {
+            var versionJson = Json.Serialize(new Dictionary<string, string>() {
+                { "app_version", appVersion }
+            });
+            using (var fs = File.OpenWrite(filePath))
+            {
+                var info = new UTF8Encoding(true).GetBytes(versionJson);
+                fs.Write(info, 0, info.Length);
+            }
+        }
+        else
+        {
+            var jsonContent = File.ReadAllText(filePath);
+            if(JsonUtil.TryDeserializeToDictionary(jsonContent, out Dictionary<string, string> dic))
+            {
+                var version = dic["app_version"];
+                var versionArr = version.Split('.');
+                var nextVersion = int.Parse(versionArr[2]) + 1;
+                var newVersion = $"{versionArr[0]}.{versionArr[1]}.{nextVersion}";
+                dic["app_version"] = newVersion;
+
+                // 全部覆盖写入
+                using (var fs = File.OpenWrite(filePath))
+                {
+                    var versionJson = Json.Serialize(dic);
+                    var info = new UTF8Encoding(true).GetBytes(versionJson);
+                    fs.Write(info, 0, info.Length);
+                }
+            }
+        }
+    }
+
+    // 将热更资源上传到远端
+    private static void SubmitToRemote()
+    {
+        // TODO: 
     }
 }
