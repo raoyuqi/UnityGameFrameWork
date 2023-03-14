@@ -21,15 +21,19 @@ namespace FrameWork.Core.SingletonManager
     /// 9. 使用远端的资源清单覆盖本地
     /// 10. 删除本地临时生成的记录下载完成的json文件
     /// </summary>
-    public sealed class HotUpdateHandler : SingletonBase<MemoryManger>
+    public sealed class HotUpdateHandler : SingletonBase<HotUpdateHandler>
     {
+        // 热更资源Url
+        private string m_HotUpdateUrl = AppConst.HotUpdateUrl;
+        private string m_AppVersionFileName = AppConst.AppVersionFileName;
+
         // 远程app版本号
         private string m_RemoteAppVersion;
         private string m_LocalAppVersion;
 
         public IEnumerator CheckVersion()
         {
-            var www = UnityWebRequest.Get("");
+            var www = UnityWebRequest.Get($"{this.m_HotUpdateUrl}/{this.m_AppVersionFileName}");
             //UnityWebRequestAssetBundle.GetAssetBundle
             yield return www.SendWebRequest();
 

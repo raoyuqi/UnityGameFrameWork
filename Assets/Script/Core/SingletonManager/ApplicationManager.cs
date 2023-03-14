@@ -12,10 +12,18 @@ public class ApplicationManager : MonoBehaviour
     [SerializeField, LabelText("引用为0的资源缓存数量")]
     private int AssetCacheCount;
 
+    [SerializeField, LabelText("热更地址")]
+    private string HotUpdateUrl;
+
+    [SerializeField, LabelText("热更版本信息文件名")]
+    private string AppVersionFileName;
+
     private void Awake()
     {
         AppConst.IsAssetBundle = this.IsAssetBundle;
         AppConst.AssetCacheCount = this.AssetCacheCount;
+        AppConst.HotUpdateUrl = this.HotUpdateUrl;
+        AppConst.AppVersionFileName = this.AppVersionFileName;
         AppConst.UIGameObjectPool = new DefaultGameObjectPool();
 
 #if !UNITY_EDITOR
@@ -28,5 +36,8 @@ public class ApplicationManager : MonoBehaviour
     private void DoAppLaunch()
     {
         MemoryManger.Instance.Initialize();
+
+        // 测试
+        this.StartCoroutine(HotUpdateHandler.Instance.CheckVersion());
     }
 }
