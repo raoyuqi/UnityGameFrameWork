@@ -1,5 +1,4 @@
-﻿using FrameWork.Core.Manager;
-using System.Collections;
+﻿using System.Collections;
 using System.IO;
 using UnityEditor;
 using UnityEngine;

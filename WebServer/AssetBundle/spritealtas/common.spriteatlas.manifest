@@ -1,0 +1,20 @@
+ManifestFileVersion: 0
+CRC: 3421130241
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: b6fcd16f6aa3662ec2b0789e8c44513d
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: 192e690a6ab30273b050a05752742228
+HashAppended: 0
+ClassTypes:
+- Class: 28
+  Script: {instanceID: 0}
+- Class: 213
+  Script: {instanceID: 0}
+- Class: 687078895
+  Script: {instanceID: 0}
+Assets:
+- Assets/AssetsPackage/SpriteAltas/Common.spriteatlas
+Dependencies: []

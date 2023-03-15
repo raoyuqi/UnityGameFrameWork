@@ -43,5 +43,6 @@ public class ApplicationManager : MonoBehaviour
 
         // 测试
         //this.StartCoroutine(HotUpdateHandler.Instance.CheckVersion());
+        HotUpdateHandler.Instance.StartHotUpdateProcess();
     }
 }

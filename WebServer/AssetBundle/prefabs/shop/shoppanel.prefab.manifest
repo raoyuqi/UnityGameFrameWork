@@ -1,0 +1,48 @@
+ManifestFileVersion: 0
+CRC: 1574676093
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: 81311e0e2b827f9aab4a46ad895f9f83
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: 4c5b7f9388feb4edbc0df58997ea0703
+HashAppended: 0
+ClassTypes:
+- Class: 1
+  Script: {instanceID: 0}
+- Class: 21
+  Script: {instanceID: 0}
+- Class: 28
+  Script: {instanceID: 0}
+- Class: 48
+  Script: {instanceID: 0}
+- Class: 114
+  Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 5f7201a12d95ffc409449d95f23cf332, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: dc42784cf147c0c48a680349fa168899, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: ca90b08c74f75bb4e901ff6e3b25777b, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: b223bfdc1d034ae43b1f42922b6c76ab, type: 3}
+- Class: 115
+  Script: {instanceID: 0}
+- Class: 128
+  Script: {instanceID: 0}
+- Class: 213
+  Script: {instanceID: 0}
+- Class: 222
+  Script: {instanceID: 0}
+- Class: 223
+  Script: {instanceID: 0}
+- Class: 224
+  Script: {instanceID: 0}
+Assets:
+- Assets/AssetsPackage/Prefabs/Shop/ShopPanel.prefab
+Dependencies:
+- D:/Project/GitProject/unity/UnityGameFrameWork/Assets/StreamingAssets/AssetBundle/imagestatic/common/examples/imagestatic.staticimages
+- D:/Project/GitProject/unity/UnityGameFrameWork/Assets/StreamingAssets/AssetBundle/imagestatic/shop/imagestatic.staticimages

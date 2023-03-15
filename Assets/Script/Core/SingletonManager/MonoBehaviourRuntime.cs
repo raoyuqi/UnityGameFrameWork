@@ -1,6 +1,6 @@
 ﻿using FrameWork.Core.Mixin;
 
-namespace FrameWork.Core.Manager
+namespace FrameWork.Core.SingletonManager
 {
     /// <summary>
     /// 统一管理MonoBehaviourRuntime

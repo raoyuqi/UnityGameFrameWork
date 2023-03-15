@@ -1,6 +1,7 @@
 ﻿using FrameWork.Core.Mixin;
 using FrameWork.Core.Utils;
 using Game.Config;
+using MiniJSON;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -35,6 +36,7 @@ namespace FrameWork.Core.SingletonManager
         public bool IsFailed;
     }
 
+    /// TODO: 分离出http下载文件类
     /// <summary>
     /// 1. 对比本地和远端的版本文件
     /// 2. 若版本不一致，则跳转第三步，否则进入游戏
@@ -71,10 +73,18 @@ namespace FrameWork.Core.SingletonManager
         private Dictionary<string, Dictionary<string, string>> m_DownloadResourceListDic;
         private Dictionary<string, Dictionary<string, string>> m_DownloadedResourceListDic;
 
+        //private string m_DownloadedResFielPath;
+
         public HotUpdateHandler()
         {
+            //this.m_DownloadedResFielPath = $"{ PathTool.GetAssetsBundlePersistentPath() }downloaded_res_list.json";
             this.m_DownloadResourceListDic = new Dictionary<string, Dictionary<string, string>>();
             this.m_DownloadedResourceListDic = new Dictionary<string, Dictionary<string, string>>();
+        }
+
+        public void StartHotUpdateProcess()
+        {
+            MonoBehaviourRuntime.Instance.StartCoroutine(this.CheckAppVersion());
         }
 
         public IEnumerator CheckAppVersion()
@@ -105,12 +115,15 @@ namespace FrameWork.Core.SingletonManager
                 yield break;
             }
 
-            var remoteSmallVersion = int.Parse($"{remoteVersionArr[1]}.{remoteVersionArr[2]}");
-            var localSmallVersion = int.Parse($"{localVersionArr[1]}.{localVersionArr[2]}");
+            var remoteSmallVersion = float.Parse($"{remoteVersionArr[1]}.{remoteVersionArr[2]}");
+            var localSmallVersion = float.Parse($"{localVersionArr[1]}.{localVersionArr[2]}");
             if (remoteLargeVersion == localLargeVersion && remoteSmallVersion > localSmallVersion)
             {
                 // TODO: 开始下载文件
+                yield return this.DownloadFile();
             }
+
+            Debug.Log("热更结束>>>>>>>>>>>>>>");
         }
 
         private IEnumerator DownloadFile()
@@ -124,87 +137,168 @@ namespace FrameWork.Core.SingletonManager
                 yield break;
             }
 
+            // 获取已经下载完成的文件列表
+            //this.m_DownloadedResourceListDic = this.GetDownloadedFileList();
+
             // 开始下载
             foreach (var item in this.m_DownloadResourceListDic)
             {
-                // TODO:下载完成校验
-
                 var filePath = item.Value["file"];
-                var www = UnityWebRequest.Get($"{ this.m_HotUpdateUrl }/{ filePath }");
-                yield return www.SendWebRequest();
-
-                if (!string.IsNullOrEmpty(www.error))
+                // TODO:下载完成校验
+                if (this.IsDownloaded(filePath))
                 {
-                    Debug.LogError(www.error);
-                    this.HotUpdateCallback(HotUpdateStatus.UpdateField, 1);
-                    yield break;
+                    Debug.Log($"该文件下载完成：{filePath}");
+                    this.HotUpdateCallback(HotUpdateStatus.Downloading, 1);
+                    yield return null;
                 }
-
-                Debug.Log($"下载成功: {filePath}");
-                // TODO: 文件不存在需要创建
-                var persistentPath = PathTool.GetAssetsBundlePersistentPath();
-                var dirPath = $"{ persistentPath }{ item.Value["dir"] }";
-                if (!Directory.Exists(dirPath))
-                    Directory.CreateDirectory(dirPath);
-
-                var persistentFilePath = $"{ persistentPath }{ filePath }";
-                using (var fs = File.OpenWrite(persistentFilePath))
+                else
                 {
-                    var data = www.downloadHandler.data;
-                    fs.Write(data, 0, data.Length);
+                    //var www = UnityWebRequest.Get($"{ this.m_HotUpdateUrl }/{ filePath }");
+                    //yield return www.SendWebRequest();
+
+                    //if (!string.IsNullOrEmpty(www.error))
+                    //{
+                    //    Debug.LogError(www.error);
+                    //    this.HotUpdateCallback(HotUpdateStatus.UpdateField, 1);
+                    //    yield break;
+                    //}
+
+                    //Debug.Log($"下载成功: {filePath}");
+                    //// TODO: 文件不存在需要创建
+                    //var persistentPath = Application.persistentDataPath;//PathTool.GetAssetsBundlePersistentPath();
+                    //var dirPath = $"{ persistentPath }/{ item.Value["dir"] }";
+                    //if (!Directory.Exists(dirPath))
+                    //    Directory.CreateDirectory(dirPath);
+
+                    //var persistentFilePath = $"{ persistentPath }/{ filePath }";
+                    //using (var fs = File.OpenWrite(persistentFilePath))
+                    //{
+                    //    var data = www.downloadHandler.data;
+                    //    fs.Write(data, 0, data.Length);
+                    //    Debug.Log("文件大小：" + fs.Length);
+                    //}
+
+                    yield return null;
+
+
+                    // 断点续传
+                    var uri = $"{ this.m_HotUpdateUrl }/{ filePath }";
+                    var headRequest = UnityWebRequest.Head(uri);
+                    yield return headRequest.SendWebRequest();
+
+                    if (!string.IsNullOrEmpty(headRequest.error))
+                    {
+                        Debug.LogError(headRequest.error);
+                        this.HotUpdateCallback(HotUpdateStatus.UpdateField, 1);
+                        yield break;
+                    }
+
+                    // 获取响应体的长度
+                    var totalLength = long.Parse(headRequest.GetResponseHeader("Content-Length"));
+
+                    // TODO: 文件不存在需要创建
+                    var persistentPath = Application.persistentDataPath;//PathTool.GetAssetsBundlePersistentPath();
+                    var dirPath = $"{ persistentPath }/{ item.Value["dir"] }";
+                    if (!Directory.Exists(dirPath))
+                        Directory.CreateDirectory(dirPath);
+
+                    var persistentFilePath = $"{ persistentPath }/{ filePath }";
+                    using (var fs = new FileStream(persistentFilePath, FileMode.OpenOrCreate, FileAccess.Write))
+                    {
+                        // 当前文件大小
+                        var fileLength = fs.Length;
+                        // 没下载完
+                        //Debug.Log($"文件大小：{ fileLength } + { totalLength } + { filePath }");
+                        if (fileLength < totalLength)
+                        {
+                            // 设置本地文件流起始位置
+                            fs.Seek(fileLength, SeekOrigin.Begin);
+                            // 请求文件
+                            var www = UnityWebRequest.Get(uri);
+                            // 从本地已下载文件大小，请求到文件末尾的所有bytes
+                            www.SetRequestHeader("Range", $"bytes={ fileLength }-");
+                            www.SendWebRequest();
+
+                            if (!string.IsNullOrEmpty(headRequest.error))
+                            {
+                                Debug.LogError(headRequest.error);
+                                this.HotUpdateCallback(HotUpdateStatus.UpdateField, 1);
+                                yield break;
+                            }
+
+                            var index = 0;
+                            while (!www.isDone)
+                            {
+                                yield return null;
+
+                                // TODO: 优化，使用固定大小的buffer接收数据 DownloadHandlerScript
+                                // DownloadHandlerScript
+                                var buffer = www.downloadHandler.data;
+                                if (buffer != null)
+                                {
+                                    var length = buffer.Length - index;
+                                    fs.Write(buffer, index, length);
+                                    index += length;
+                                    fileLength += length;
+                                    Debug.Log($"本次下载大小：{ length } + { buffer.Length } + { totalLength }");
+                                    this.HotUpdateCallback(HotUpdateStatus.Downloading, 1);
+                                }
+                            }
+
+                            Debug.Log($"本次下载大小：www.downloadHandler.data  + { www.downloadHandler.data.Length }");
+                        }
+                    }
+
+                    // 更新下载完成文件
+                    //this.UpdateDownloadedFileListDic(filePath);
+
+
+                    //AssetBundle bundle = DownloadHandlerAssetBundle.GetContent(www);
+
+                    // TODO: 下载百分比进度
+                    this.HotUpdateCallback(HotUpdateStatus.Downloading, 1);
                 }
-
-                var size = new FileInfo(persistentFilePath).Length;
-                Debug.Log("文件大小：" + size);
-
-                //AssetBundle bundle = DownloadHandlerAssetBundle.GetContent(www);
-
-                // TODO: 下载百分比进度
-                this.HotUpdateCallback(HotUpdateStatus.Downloading, 1);
             }
         }
 
-
         private IEnumerator GetDownloadFileList()
         {
-            var www = UnityWebRequest.Get($"{this.m_HotUpdateUrl}/{this.m_ResListFileName}");
+            var www = UnityWebRequest.Get($"{this.m_HotUpdateUrl}/AssetBundle/{this.m_ResListFileName}");
             yield return www.SendWebRequest();
 
-            Dictionary<string, Dictionary<string, string>> remoteListDic = null;
             if (!string.IsNullOrEmpty(www.error))
             {
                 Debug.LogError(www.error);
                 yield break;
             }
-            else
+
+            Dictionary<string, Dictionary<string, string>> remoteListDic = null;
+            Debug.Log(www.downloadHandler.text);
+            //byte[] results = www.downloadHandler.data;
+            var jsonStr = www.downloadHandler.text;
+            if (!JsonUtil.TryDeserializeToDictionary(jsonStr, out remoteListDic))
+                yield break;
+
+            var localListDic = this.GetLocalResourceList();
+            foreach (var item in remoteListDic)
             {
-                Debug.Log(www.downloadHandler.text);
-                //byte[] results = www.downloadHandler.data;
-                var jsonStr = www.downloadHandler.text;
-                if (!JsonUtil.TryDeserializeToDictionary(jsonStr, out remoteListDic))
-                    yield break;
-
-                var localListDic = this.GetLocalResourceList();
-                foreach (var item in remoteListDic)
+                if (!localListDic.ContainsKey(item.Key))
                 {
-                    if (!localListDic.ContainsKey(item.Key))
-                    {
-                        // 新增的资源
-                        this.m_DownloadedResourceListDic.Add(item.Key, item.Value);
-                        continue;
-                    }
-
-                    var remoteFileInfo = item.Value;
-                    var localFileInfo = localListDic[item.Key];
-                    if (localFileInfo["md5"] != remoteFileInfo["md5"])
-                        this.m_DownloadedResourceListDic.Add(item.Key, item.Value);
+                    // 新增的资源
+                    this.m_DownloadResourceListDic.Add(item.Key, item.Value);
+                    continue;
                 }
+
+                var remoteFileInfo = item.Value;
+                var localFileInfo = localListDic[item.Key];
+                if (localFileInfo["md5"] != remoteFileInfo["md5"])
+                    this.m_DownloadResourceListDic.Add(item.Key, item.Value);
             }
         }
 
         public IEnumerator GetRemoteAppVersion()
         {
-            var www = UnityWebRequest.Get($"{this.m_HotUpdateUrl}/{this.m_AppVersionFileName}");
+            var www = UnityWebRequest.Get($"{this.m_HotUpdateUrl}/AssetBundle/{this.m_AppVersionFileName}");
             //UnityWebRequestAssetBundle.GetAssetBundle
             yield return www.SendWebRequest();
 
@@ -255,6 +349,72 @@ namespace FrameWork.Core.SingletonManager
                 return dic;
 
             return default;
+        }
+
+        private Dictionary<string, Dictionary<string, string>> GetDownloadedFileList()
+        {
+            var filePath = $"{ PathTool.GetAssetsBundlePersistentPath() }downloaded_res_list.json";
+            if (File.Exists(filePath))
+            {
+                var jsonStr = File.ReadAllText(filePath);
+                if (JsonUtil.TryDeserializeToDictionary(jsonStr, out Dictionary<string, Dictionary<string, string>> dic))
+                    return dic;
+            }
+
+            return null;
+        }
+
+        private bool IsDownloaded(string filePath)
+        {
+            //if (this.m_DownloadedResourceListDic == null)
+            //    return false;
+
+            //var downloadedInfo = this.m_DownloadedResourceListDic[filePath];
+            var downloadInfo = this.m_DownloadResourceListDic[filePath];
+            var absolutePath = $"{ Application.persistentDataPath }/{ filePath }";
+            if (!File.Exists(absolutePath))
+                return false;
+
+            var fileInfo = new FileInfo(absolutePath);
+            var md5 = MD5Util.GetFileInfoMD5(fileInfo);
+
+            return md5 == downloadInfo["md5"];
+        }
+
+        private void UpdateDownloadedFileListDic(string filePath)
+        {
+            if (this.m_DownloadedResourceListDic == null)
+                this.m_DownloadedResourceListDic = new Dictionary<string, Dictionary<string, string>>();
+
+            var absolutePath = $"{ Application.persistentDataPath }/{ filePath }";
+            if (!File.Exists(absolutePath))
+            {
+                Debug.LogError($"本地文件为空: {absolutePath}");
+                File.Create(absolutePath);
+            }
+
+            var fileInfo = new FileInfo(absolutePath);
+            var dirPath = PathTool.GetDirectoryRelativelyPath($"{Application.persistentDataPath}/", fileInfo.DirectoryName);
+            var md5 = MD5Util.GetFileInfoMD5(fileInfo);
+
+            if (this.m_DownloadedResourceListDic.ContainsKey(filePath))
+            {
+                var info = this.m_DownloadedResourceListDic[filePath];
+                info["dir"] = dirPath;
+                info["file"] = filePath;
+                info["md5"] = md5;
+                return;
+            }
+
+            this.m_DownloadedResourceListDic[filePath] = new Dictionary<string, string>();
+            this.m_DownloadedResourceListDic[filePath].Add("dir", dirPath);
+            this.m_DownloadedResourceListDic[filePath].Add("file", filePath);
+            this.m_DownloadedResourceListDic[filePath].Add("md5", md5);
+
+            using(FileStream fs = File.OpenWrite(absolutePath))
+            {
+                var json = Json.Serialize(this.m_DownloadedResourceListDic);
+            }
         }
 
         private void HotUpdateCallback(HotUpdateStatus status, float progress)

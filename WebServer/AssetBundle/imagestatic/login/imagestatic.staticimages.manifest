@@ -1,0 +1,20 @@
+ManifestFileVersion: 0
+CRC: 1936728999
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: ba57059e9ed0ef70bcb4764eb2009417
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: 9e6ad29cbd2df8fbe1a15315db0e51ab
+HashAppended: 0
+ClassTypes:
+- Class: 28
+  Script: {instanceID: 0}
+- Class: 213
+  Script: {instanceID: 0}
+Assets:
+- Assets/AssetsPackage/ImageStatic/Login/customer_service.png
+- Assets/AssetsPackage/ImageStatic/Login/com_btn_yellow_4.png
+- Assets/AssetsPackage/ImageStatic/Login/customer_service_bg.png
+Dependencies: []

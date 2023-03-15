@@ -30,23 +30,23 @@ public class BuildAssetBundles
     [MenuItem("自定义工具/Build Asset Bundles")]
     public static void Build()
     {
-        //var buildList = new List<AssetBundleBuild>();
-        //BuildAtlasAssetBundle(buildList);
+        var buildList = new List<AssetBundleBuild>();
+        BuildAtlasAssetBundle(buildList);
 
-        //var path = PathCombine(_ASSETS_DIRECTORY_ROOT, "ImageStatic");
-        //BuildImageAssetBundle(path, buildList);
+        var path = PathCombine(_ASSETS_DIRECTORY_ROOT, "ImageStatic");
+        BuildImageAssetBundle(path, buildList);
 
-        //BuildPrefabAssetBundle(buildList);
+        BuildPrefabAssetBundle(buildList);
 
-        //SpriteAtlasUtility.PackAtlases(_CREATE_ATLASES.ToArray(), EditorUserBuildSettings.activeBuildTarget);
+        SpriteAtlasUtility.PackAtlases(_CREATE_ATLASES.ToArray(), EditorUserBuildSettings.activeBuildTarget);
 
-        //AssetBundleBuild[] buildMap = buildList.ToArray();
-        //BuildPipeline.BuildAssetBundles(
-        //    Application.streamingAssetsPath + "/AssetBundle",
-        //    buildMap,
-        //    BuildAssetBundleOptions.None,
-        //    BuildTarget.StandaloneWindows
-        //);
+        AssetBundleBuild[] buildMap = buildList.ToArray();
+        BuildPipeline.BuildAssetBundles(
+            Application.streamingAssetsPath + "/AssetBundle",
+            buildMap,
+            BuildAssetBundleOptions.None,
+            BuildTarget.StandaloneWindows
+        );
 
         GenerateVersionFile();
 

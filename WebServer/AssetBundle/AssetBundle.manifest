@@ -1,0 +1,43 @@
+ManifestFileVersion: 0
+CRC: 1687960389
+AssetBundleManifest:
+  AssetBundleInfos:
+    Info_0:
+      Name: spritealtas/common.spriteatlas
+      Dependencies: {}
+    Info_1:
+      Name: spritealtas/login.spriteatlas
+      Dependencies: {}
+    Info_2:
+      Name: spritealtas/main.spriteatlas
+      Dependencies: {}
+    Info_3:
+      Name: imagestatic/common/examples/imagestatic.staticimages
+      Dependencies: {}
+    Info_4:
+      Name: imagestatic/login/imagestatic.staticimages
+      Dependencies: {}
+    Info_5:
+      Name: imagestatic/main/imagestatic.staticimages
+      Dependencies: {}
+    Info_6:
+      Name: imagestatic/shop/imagestatic.staticimages
+      Dependencies: {}
+    Info_7:
+      Name: prefabs/uimanager.prefab
+      Dependencies: {}
+    Info_8:
+      Name: prefabs/login/loginpanel.prefab
+      Dependencies:
+        Dependency_0: imagestatic/common/examples/imagestatic.staticimages
+        Dependency_1: imagestatic/login/imagestatic.staticimages
+    Info_9:
+      Name: prefabs/main/mainpanel.prefab
+      Dependencies:
+        Dependency_0: imagestatic/common/examples/imagestatic.staticimages
+        Dependency_1: imagestatic/main/imagestatic.staticimages
+    Info_10:
+      Name: prefabs/shop/shoppanel.prefab
+      Dependencies:
+        Dependency_0: imagestatic/common/examples/imagestatic.staticimages
+        Dependency_1: imagestatic/shop/imagestatic.staticimages
