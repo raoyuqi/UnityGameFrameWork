@@ -256,7 +256,8 @@ MonoBehaviour:
   IsAssetBundle: 1
   AssetCacheCount: 30
   HotUpdateUrl: http://127.0.0.1/AssetBundle
-  AppVersionFileName: AppVersion.json
+  AppVersionFileName: app_version.json
+  AppResourceListFileName: res_list.json
 --- !u!20 &660204969675841534
 Camera:
   m_ObjectHideFlags: 0

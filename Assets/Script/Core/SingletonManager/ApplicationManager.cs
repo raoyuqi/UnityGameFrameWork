@@ -18,12 +18,16 @@ public class ApplicationManager : MonoBehaviour
     [SerializeField, LabelText("热更版本信息文件名")]
     private string AppVersionFileName;
 
+    [SerializeField, LabelText("资源清单文件名")]
+    private string AppResourceListFileName;
+
     private void Awake()
     {
         AppConst.IsAssetBundle = this.IsAssetBundle;
         AppConst.AssetCacheCount = this.AssetCacheCount;
         AppConst.HotUpdateUrl = this.HotUpdateUrl;
         AppConst.AppVersionFileName = this.AppVersionFileName;
+        AppConst.AppResourceListFileName = this.AppResourceListFileName;
         AppConst.UIGameObjectPool = new DefaultGameObjectPool();
 
 #if !UNITY_EDITOR
@@ -38,6 +42,6 @@ public class ApplicationManager : MonoBehaviour
         MemoryManger.Instance.Initialize();
 
         // 测试
-        this.StartCoroutine(HotUpdateHandler.Instance.CheckVersion());
+        //this.StartCoroutine(HotUpdateHandler.Instance.CheckVersion());
     }
 }
