@@ -41,23 +41,7 @@ SpriteAtlas:
     totalSpriteSurfaceArea: 0
     bindAsDefault: 1
   m_MasterAtlas: {fileID: 0}
-  m_PackedSprites:
-  - {fileID: 21300000, guid: 360967624555bc9488efc214077c0538, type: 3}
-  - {fileID: 21300000, guid: e309dd244abc7e147bb90dcc7f63ad22, type: 3}
-  - {fileID: 21300000, guid: 9d8b82468b6df3b47b42d4b7a7831af8, type: 3}
-  - {fileID: 21300000, guid: 6bcc6ab6398080f4292e0019ecac53a7, type: 3}
-  - {fileID: 21300000, guid: a348dcb74c557904790b2e0fc130c4f5, type: 3}
-  - {fileID: 21300000, guid: f1ad4d6a0ca57104d9e06bb5d243c4a8, type: 3}
-  - {fileID: 21300000, guid: 4faa457db60bab24795b16a9e2f2cd96, type: 3}
-  - {fileID: 21300000, guid: e496d7fdfaec982489ab2054035d3538, type: 3}
-  m_PackedSpriteNamesToIndex:
-  - close_menu
-  - img_hour
-  - img_input_di
-  - custom_bg
-  - level_bg
-  - grade_bg
-  - chat_frame_bg
-  - img_sign_bg
+  m_PackedSprites: []
+  m_PackedSpriteNamesToIndex: []
   m_Tag: Main
   m_IsVariant: 0
