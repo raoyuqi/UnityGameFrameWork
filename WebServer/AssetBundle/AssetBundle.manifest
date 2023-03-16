@@ -1,5 +1,5 @@
 ManifestFileVersion: 0
-CRC: 1687960389
+CRC: 724671202
 AssetBundleManifest:
   AssetBundleInfos:
     Info_0:
@@ -41,3 +41,6 @@ AssetBundleManifest:
       Dependencies:
         Dependency_0: imagestatic/common/examples/imagestatic.staticimages
         Dependency_1: imagestatic/shop/imagestatic.staticimages
+    Info_11:
+      Name: prefabs/update/hotupdatepanel.prefab
+      Dependencies: {}

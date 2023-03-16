@@ -1,4 +1,5 @@
 ﻿using FrameWork.Core.Attributes;
+using FrameWork.Core.HotUpdate;
 using FrameWork.Core.Modules.Pool;
 using FrameWork.Core.SingletonManager;
 using Game.Config;
@@ -43,6 +44,6 @@ public class ApplicationManager : MonoBehaviour
 
         // 测试
         //this.StartCoroutine(HotUpdateHandler.Instance.CheckVersion());
-        HotUpdateHandler.Instance.StartHotUpdateProcess();
+        new HotUpdateHandler().StartHotUpdateProcess();
     }
 }
