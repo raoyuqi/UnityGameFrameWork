@@ -20,7 +20,7 @@ namespace FrameWork.Core.HotUpdate
         Downloading = 3,    // 资源下载中
 
         UpdateSuccess = 4,  // 更新完成
-        UpdateField = 5,    // 更新失败
+        UpdateFailed = 5,    // 更新失败
 
         Decompressing = 6,  // 资源解压中
     }
@@ -56,7 +56,15 @@ namespace FrameWork.Core.HotUpdate
 
         //public delegate void HotUpdateCallback(HotUpdateCallbackInfo status);
 
-        public HotUpdateStatus HotUpdateStatus { get; private set; }
+        public HotUpdateStatus UpdateStatus { get; private set; }
+
+        public bool IsFailed
+        {
+            get
+            {
+                return this.UpdateStatus == HotUpdateStatus.UpdateFailed;
+            }
+        }
 
         // 热更资源Url
         private string m_HotUpdateUrl = AppConst.HotUpdateUrl;
@@ -151,17 +159,19 @@ namespace FrameWork.Core.HotUpdate
             {
                 // TODO: 弹出错误窗口
                 Debug.LogError($"热更新失败 msg = { msg }");
-                this.HotUpdateCallback(HotUpdateStatus.UpdateField, 1);
+                this.HotUpdateCallback(HotUpdateStatus.UpdateFailed, 1);
             };
 
             hotFileDownloader.OnProgress += (curLen, totalLen) =>
             {
                 Debug.Log($"更新中... curLen = { curLen }, totalLen = { totalLen }");
+                this.HotUpdateCallback(HotUpdateStatus.Downloading, 1);
             };
 
             foreach (var item in this.m_DownloadResourceListDic)
             {
-                // TODO: 下载失败后退出下载流程
+                if (this.IsFailed)
+                    yield break;
 
                 var filePath = item.Value["file"];
                 // TODO:下载完成校验
@@ -169,12 +179,10 @@ namespace FrameWork.Core.HotUpdate
                 {
                     Debug.Log($"该文件下载完成：{filePath}");
                     this.HotUpdateCallback(HotUpdateStatus.Downloading, 1);
-                    yield return null;
+                    yield return new WaitForEndOfFrame();
                 }
                 else
                 {
-                    yield return null;
-
                     // 断点续传
                     var uri = $"{ this.m_HotUpdateUrl }/{ filePath }";
                     //var headRequest = UnityWebRequest.Head(uri);
@@ -255,7 +263,7 @@ namespace FrameWork.Core.HotUpdate
                     //AssetBundle bundle = DownloadHandlerAssetBundle.GetContent(www);
 
                     // TODO: 下载百分比进度
-                    this.HotUpdateCallback(HotUpdateStatus.Downloading, 1);
+                    //this.HotUpdateCallback(HotUpdateStatus.Downloading, 1);
                 }
             }
 
@@ -423,12 +431,13 @@ namespace FrameWork.Core.HotUpdate
 
         private void HotUpdateCallback(HotUpdateStatus status, float progress)
         {
+            this.UpdateStatus = status;
             // TODO: 简化代码
             var info = new HotUpdateCallbackInfo()
             {
                 Progress = progress,
                 IsDone = status == HotUpdateStatus.UpdateSuccess || status == HotUpdateStatus.NotUpdate,
-                IsFailed = status == HotUpdateStatus.UpdateField,
+                IsFailed = this.IsFailed,
                 UpdateTip = "更新中..."
             };
             this.UpdateCallback?.Invoke(info);
