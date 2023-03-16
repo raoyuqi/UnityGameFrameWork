@@ -1,4 +1,5 @@
 ﻿using FrameWork.Core.Utils;
+using Game.Config;
 using MiniJSON;
 using System.Collections;
 using System.Collections.Generic;
@@ -29,23 +30,23 @@ public class BuildAssetBundles
     [MenuItem("自定义工具/Build Asset Bundles")]
     public static void Build()
     {
-        //var buildList = new List<AssetBundleBuild>();
-        //BuildAtlasAssetBundle(buildList);
+        var buildList = new List<AssetBundleBuild>();
+        BuildAtlasAssetBundle(buildList);
 
-        //var path = PathCombine(_ASSETS_DIRECTORY_ROOT, "ImageStatic");
-        //BuildImageAssetBundle(path, buildList);
+        var path = PathCombine(_ASSETS_DIRECTORY_ROOT, "ImageStatic");
+        BuildImageAssetBundle(path, buildList);
 
-        //BuildPrefabAssetBundle(buildList);
+        BuildPrefabAssetBundle(buildList);
 
-        //SpriteAtlasUtility.PackAtlases(_CREATE_ATLASES.ToArray(), EditorUserBuildSettings.activeBuildTarget);
+        SpriteAtlasUtility.PackAtlases(_CREATE_ATLASES.ToArray(), EditorUserBuildSettings.activeBuildTarget);
 
-        //AssetBundleBuild[] buildMap = buildList.ToArray();
-        //BuildPipeline.BuildAssetBundles(
-        //    Application.streamingAssetsPath + "/AssetBundle",
-        //    buildMap,
-        //    BuildAssetBundleOptions.None,
-        //    BuildTarget.StandaloneWindows
-        //);
+        AssetBundleBuild[] buildMap = buildList.ToArray();
+        BuildPipeline.BuildAssetBundles(
+            Application.streamingAssetsPath + "/AssetBundle",
+            buildMap,
+            BuildAssetBundleOptions.None,
+            BuildTarget.StandaloneWindows
+        );
 
         GenerateVersionFile();
 
@@ -218,7 +219,8 @@ public class BuildAssetBundles
         if (directoryInfo == null)
             return;
 
-        var list = new List<Dictionary<string, string>>();
+        //var list = new List<Dictionary<string, string>>();
+        var dic = new Dictionary<string, Dictionary<string, string>>();
         var files = directoryInfo.GetFiles("*", SearchOption.AllDirectories);
         foreach (var file in files)
         {
@@ -231,15 +233,15 @@ public class BuildAssetBundles
 
             var filePath = PathTool.GetDirectoryRelativelyPath(_STREAMING_ASSETS_PATH_ROOT, file.FullName);
             var dirPath = PathTool.GetDirectoryRelativelyPath(_STREAMING_ASSETS_PATH_ROOT, file.DirectoryName);
-            list.Add(new Dictionary<string, string>() {
+            dic.Add(filePath, new Dictionary<string, string>() {
                 { "dir", dirPath },
                 { "file", filePath },
                 { "md5", MD5Util.GetFileInfoMD5(file) },
             });
         }
 
-        var json = Json.Serialize(list);
-        var resFilePath = $"{ PathTool.GetAssetsBundleStreamingPath() }ResourceList.json";
+        var json = Json.Serialize(dic);
+        var resFilePath = $"{ PathTool.GetAssetsBundleStreamingPath() }res_list.json";
         using (FileStream fs = File.OpenWrite(resFilePath))
         {
             var info = new UTF8Encoding(true).GetBytes(json);
@@ -251,7 +253,7 @@ public class BuildAssetBundles
     private static void GenerateVersionFile()
     {
         var appVersion = PlayerSettings.bundleVersion;
-        var filePath = $"{ PathTool.GetAssetsBundleStreamingPath() }AppVersion.json";
+        var filePath = $"{ PathTool.GetAssetsBundleStreamingPath() }app_version.json";
         if (!File.Exists(filePath))
         {
             var versionJson = Json.Serialize(new Dictionary<string, string>() {

@@ -17,5 +17,7 @@ namespace Game.Config
         public static string HotUpdateUrl;
         // 热更版本信息文件名
         public static string AppVersionFileName;
+        // 资源清单文件名
+        public static string AppResourceListFileName;
     }
 }

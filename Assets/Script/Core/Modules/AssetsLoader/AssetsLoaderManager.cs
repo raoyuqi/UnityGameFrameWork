@@ -1,5 +1,4 @@
-﻿using FrameWork.Core.Manager;
-using FrameWork.Core.Modules.AssetsLoader;
+﻿using FrameWork.Core.Modules.AssetsLoader;
 using FrameWork.Core.SingletonManager;
 using Game.Config;
 using System.Collections;
