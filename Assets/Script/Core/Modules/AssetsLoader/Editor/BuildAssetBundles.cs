@@ -33,7 +33,7 @@ public class BuildAssetBundles
         var buildList = new List<AssetBundleBuild>();
         BuildAtlasAssetBundle(buildList);
 
-        var path = PathCombine(_ASSETS_DIRECTORY_ROOT, "ImageStatic");
+        var path = PathCombine(_ASSETS_DIRECTORY_ROOT, "Arts/Images");
         BuildImageAssetBundle(path, buildList);
 
         BuildPrefabAssetBundle(buildList);
@@ -103,7 +103,7 @@ public class BuildAssetBundles
         {
             var files = dirInfo.GetFiles("*", SearchOption.TopDirectoryOnly);
             var relativelyPath = PathTool.GetDirectoryRelativelyPath($"{_ASSETS_DIRECTORY_ROOT}/", dirInfo.FullName);
-            var assetBundleName = $"{relativelyPath}/ImageStatic.staticimages";
+            var assetBundleName = $"{relativelyPath}/Images.staticimages";
 
             var nameList = new List<string>();
             foreach (var fileInfo in files)
@@ -237,6 +237,7 @@ public class BuildAssetBundles
                 { "dir", dirPath },
                 { "file", filePath },
                 { "md5", MD5Util.GetFileInfoMD5(file) },
+                { "size", file.Length.ToString() }
             });
         }
 

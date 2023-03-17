@@ -35,15 +35,20 @@ public class ApplicationManager : MonoBehaviour
         AppConst.IsAssetBundle = true;
 #endif
 
+        MemoryManger.Instance.Initialize();
+
+        // TODO: 是否热更
+        HotUpdateHandler.Instance.Initialize();
+    }
+
+    private void Start()
+    {
         this.DoAppLaunch();
     }
 
     private void DoAppLaunch()
     {
-        MemoryManger.Instance.Initialize();
-
         // 测试
-        //this.StartCoroutine(HotUpdateHandler.Instance.CheckVersion());
-        new HotUpdateHandler().StartHotUpdateProcess();
+        HotUpdateHandler.Instance.StartHotUpdateProcess();
     }
 }
