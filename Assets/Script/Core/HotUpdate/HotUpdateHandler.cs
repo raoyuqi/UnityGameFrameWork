@@ -1,4 +1,5 @@
-﻿using FrameWork.Core.SingletonManager;
+﻿using FrameWork.Core.Mixin;
+using FrameWork.Core.SingletonManager;
 using FrameWork.Core.Utils;
 using Game.Config;
 using MiniJSON;
@@ -30,7 +31,11 @@ namespace FrameWork.Core.HotUpdate
         // 更新提示
         public string UpdateTip;
         // 进度
-        public float Progress;
+        //public float Progress;
+        // 当前进度
+        public float CurProgress;
+        // 总进度
+        public float TotalProgress;
 
         public bool IsDone;
         public bool IsFailed;
@@ -50,9 +55,12 @@ namespace FrameWork.Core.HotUpdate
     /// 9. 使用远端的资源清单覆盖本地
     /// 10. 删除本地临时生成的记录下载完成的json文件
     /// </summary>
-    public sealed class HotUpdateHandler
+    public sealed class HotUpdateHandler : SingletonBase<HotUpdateHandler>
     {
-        public event Action<HotUpdateCallbackInfo> UpdateCallback;
+        public event Action<HotUpdateCallbackInfo> UpdateProgressCallback;
+        public event Action ForceUpdateCallback;
+        public event Action UpdateFailedCallback;
+        public event Action UpdateSuccessCallback;
 
         //public delegate void HotUpdateCallback(HotUpdateCallbackInfo status);
 
@@ -67,9 +75,14 @@ namespace FrameWork.Core.HotUpdate
         }
 
         // 热更资源Url
-        private string m_HotUpdateUrl = AppConst.HotUpdateUrl;
-        private string m_AppVersionFileName = AppConst.AppVersionFileName;
-        private string m_ResListFileName = AppConst.AppResourceListFileName;
+        private string m_HotUpdateUrl;
+        private string m_AppVersionFileName;
+        private string m_ResListFileName;
+
+        // 需要热更的文件大小 b
+        private long m_HotUpdateFileLength;
+        // 已下载大小 b
+        private long m_DownloadedFileLength;
 
         // app版本号
         private string m_RemoteAppVersion;
@@ -83,8 +96,11 @@ namespace FrameWork.Core.HotUpdate
 
         //private string m_DownloadedResFielPath;
 
-        public HotUpdateHandler()
+        public void Initialize()
         {
+            this.m_HotUpdateUrl = AppConst.HotUpdateUrl;
+            this.m_AppVersionFileName = AppConst.AppVersionFileName;
+            this.m_ResListFileName = AppConst.AppResourceListFileName;
             //this.m_DownloadedResFielPath = $"{ PathTool.GetAssetsBundlePersistentPath() }downloaded_res_list.json";
             this.m_DownloadResourceListDic = new Dictionary<string, Dictionary<string, string>>();
             this.m_DownloadedResourceListDic = new Dictionary<string, Dictionary<string, string>>();
@@ -102,19 +118,24 @@ namespace FrameWork.Core.HotUpdate
             if (string.IsNullOrEmpty(this.m_RemoteAppVersion))
             {
                 // 远端没有版本文件，无需更行
-                this.HotUpdateCallback(HotUpdateStatus.NotUpdate, 1);
+                this.HotUpdateCallback(HotUpdateStatus.NotUpdate);
                 yield break;
             }
 
             this.m_LocalAppVersion = this.GetLocalAppVersion();
 
             Debug.Log($"m_RemoteAppVersion = {this.m_RemoteAppVersion}, m_LocalAppVersion = {this.m_LocalAppVersion}");
+            if (this.m_RemoteAppVersion == this.m_LocalAppVersion)
+            {
+                this.HotUpdateCallback(HotUpdateStatus.NotUpdate);
+                yield break;
+            }
 
             var remoteVersionArr = this.m_RemoteAppVersion.Split('.');
             var localVersionArr = this.m_LocalAppVersion.Split('.');
             if (remoteVersionArr.Length == 0 || localVersionArr.Length == 0)
             {
-                this.HotUpdateCallback(HotUpdateStatus.NotUpdate, 1);
+                this.HotUpdateCallback(HotUpdateStatus.NotUpdate);
                 yield break;
             }
 
@@ -123,7 +144,7 @@ namespace FrameWork.Core.HotUpdate
             if (remoteLargeVersion > localLargeVersion)
             {
                 Debug.Log($"remoteLargeVersion = {remoteLargeVersion}, localLargeVersion = {localLargeVersion}");
-                this.HotUpdateCallback(HotUpdateStatus.ForceUpdate, 1);
+                this.HotUpdateCallback(HotUpdateStatus.ForceUpdate);
                 yield break;
             }
 
@@ -146,7 +167,7 @@ namespace FrameWork.Core.HotUpdate
 
             if (this.m_DownloadResourceListDic.Count == 0)
             {
-                this.HotUpdateCallback(HotUpdateStatus.NotUpdate, 1);
+                this.HotUpdateCallback(HotUpdateStatus.NotUpdate);
                 yield break;
             }
 
@@ -159,13 +180,13 @@ namespace FrameWork.Core.HotUpdate
             {
                 // TODO: 弹出错误窗口
                 Debug.LogError($"热更新失败 msg = { msg }");
-                this.HotUpdateCallback(HotUpdateStatus.UpdateFailed, 1);
+                this.HotUpdateCallback(HotUpdateStatus.UpdateFailed);
             };
 
             hotFileDownloader.OnProgress += (curLen, totalLen) =>
             {
                 Debug.Log($"更新中... curLen = { curLen }, totalLen = { totalLen }");
-                this.HotUpdateCallback(HotUpdateStatus.Downloading, 1);
+                this.HotUpdateCallback(HotUpdateStatus.Downloading, curLen);
             };
 
             foreach (var item in this.m_DownloadResourceListDic)
@@ -174,11 +195,10 @@ namespace FrameWork.Core.HotUpdate
                     yield break;
 
                 var filePath = item.Value["file"];
-                // TODO:下载完成校验
                 if (this.IsDownloaded(filePath))
                 {
                     Debug.Log($"该文件下载完成：{filePath}");
-                    this.HotUpdateCallback(HotUpdateStatus.Downloading, 1);
+                    this.HotUpdateCallback(HotUpdateStatus.Downloading, float.Parse(item.Value["size"]));
                     yield return new WaitForEndOfFrame();
                 }
                 else
@@ -199,7 +219,7 @@ namespace FrameWork.Core.HotUpdate
                     //var totalLength = long.Parse(headRequest.GetResponseHeader("Content-Length"));
 
                     //// TODO: 文件不存在需要创建
-                    var persistentPath = Application.persistentDataPath;//PathTool.GetAssetsBundlePersistentPath();
+                    var persistentPath = Application.persistentDataPath;
                     var dirPath = $"{ persistentPath }/{ item.Value["dir"] }";
                     if (!Directory.Exists(dirPath))
                         Directory.CreateDirectory(dirPath);
@@ -281,6 +301,7 @@ namespace FrameWork.Core.HotUpdate
                 yield break;
             }
 
+            this.m_HotUpdateFileLength = 0;
             Dictionary<string, Dictionary<string, string>> remoteListDic = null;
             Debug.Log(www.downloadHandler.text);
             //byte[] results = www.downloadHandler.data;
@@ -294,6 +315,7 @@ namespace FrameWork.Core.HotUpdate
                 if (!localListDic.ContainsKey(item.Key))
                 {
                     // 新增的资源
+                    this.m_HotUpdateFileLength += long.Parse(item.Value["size"]);
                     this.m_DownloadResourceListDic.Add(item.Key, item.Value);
                     continue;
                 }
@@ -302,10 +324,14 @@ namespace FrameWork.Core.HotUpdate
                 var localFileInfo = localListDic[item.Key];
                 if (localFileInfo["md5"] != remoteFileInfo["md5"])
                 {
+                    this.m_HotUpdateFileLength += long.Parse(item.Value["size"]);
                     this.m_DownloadResourceListDic.Add(item.Key, item.Value);
                     Debug.Log($"需要下载：{ item.Key }");
                 }
             }
+
+            //this.m_HotUpdateFileLength /= 1024;
+            Debug.Log("总共要下载 this.m_HotUpdateFileLength ====== " + this.m_HotUpdateFileLength);
         }
 
         public IEnumerator GetRemoteAppVersion()
@@ -429,18 +455,39 @@ namespace FrameWork.Core.HotUpdate
             }
         }
 
-        private void HotUpdateCallback(HotUpdateStatus status, float progress)
+        private void HotUpdateCallback(HotUpdateStatus status, float curLen = 0)
         {
+            this.m_DownloadedFileLength += (long)curLen;
+            Debug.Log("this.m_DownloadedFileLength ==== " + this.m_DownloadedFileLength);
             this.UpdateStatus = status;
-            // TODO: 简化代码
-            var info = new HotUpdateCallbackInfo()
+
+            switch (status)
             {
-                Progress = progress,
-                IsDone = status == HotUpdateStatus.UpdateSuccess || status == HotUpdateStatus.NotUpdate,
-                IsFailed = this.IsFailed,
-                UpdateTip = "更新中..."
-            };
-            this.UpdateCallback?.Invoke(info);
+                case HotUpdateStatus.NotUpdate:
+                case HotUpdateStatus.UpdateSuccess:
+                    this.UpdateSuccessCallback?.Invoke();
+                    break;
+                case HotUpdateStatus.ForceUpdate:
+                    this.ForceUpdateCallback?.Invoke();
+                    break;
+                //case HotUpdateStatus.UpdateResources:
+                //    break;
+                case HotUpdateStatus.Downloading:
+                    this.UpdateProgressCallback?.Invoke(new HotUpdateCallbackInfo()
+                    {
+                        CurProgress = this.m_DownloadedFileLength / 1024,
+                        TotalProgress = this.m_HotUpdateFileLength / 1024,
+                        IsDone = false,
+                        IsFailed = false,
+                        UpdateTip = "更新中..."
+                    });
+                    break;
+                case HotUpdateStatus.UpdateFailed:
+                    this.UpdateFailedCallback?.Invoke();
+                    break;
+                //case HotUpdateStatus.Decompressing:
+                //    break;
+            }
         }
     }
 }
