@@ -43,7 +43,6 @@ namespace FrameWork.Core.Net.Handler
         ~HttpDownloadHandler()
         {
             // 清理操作
-            Debug.Log("------ 清理操作 ------  ");
         }
 
         // 接收到带有Content-Length标头的回调
@@ -51,7 +50,6 @@ namespace FrameWork.Core.Net.Handler
         {
             this.m_ContentLength = (long)contentLength;
             this.m_TotalLength = this.DownloadedLength + this.m_ContentLength;
-            Debug.Log($"this.m_TotalLength = { this.m_TotalLength } + { this.m_ContentLength }");
         }
 
         protected override bool ReceiveData(byte[] data, int dataLength)
@@ -63,14 +61,13 @@ namespace FrameWork.Core.Net.Handler
             {
                 // 当前文件大小
                 //var fileLength = fs.Length;
-                Debug.Log($"本次下载 = {fs.Length} + {dataLength}");
 
                 // 设置本地文件流起始位置
                 fs.Seek(fs.Length, SeekOrigin.Begin);
                 fs.Write(data, 0, dataLength);
                 this.DownloadedLength += dataLength;
                 // 回调
-                this.OnProgress?.Invoke(this.DownloadedLength, this.m_TotalLength);
+                this.OnProgress?.Invoke(dataLength, this.m_TotalLength);
                 return true;
             }
         }

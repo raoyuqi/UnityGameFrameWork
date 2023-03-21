@@ -16,14 +16,45 @@ public class UpdatePanel : MonoBehaviour
 
     private void Awake()
     {
-        HotUpdateHandler.Instance.UpdateProgressCallback += OnHotUpdateProgress;
+        HotUpdateHandler.Instance.NotUpdateCallback += OnNotUpdateHandler;
+        HotUpdateHandler.Instance.ForceUpdateCallback += OnForceUpdateHandler;
+        HotUpdateHandler.Instance.UpdateProgressCallback += OnHotUpdateProgressHandler;
+        HotUpdateHandler.Instance.UpdateSuccessCallback += OnHotUpdateSuccessHandler;
+        HotUpdateHandler.Instance.UpdateFailedCallback += OnHotUpdateFailedHandler;
     }
 
-    private void OnHotUpdateProgress(HotUpdateCallbackInfo info)
+    private void OnDestroy()
     {
-        Debug.Log("--------------更新进度条: " + info.CurProgress + info.UpdateTip + info.TotalProgress);
-        this.m_TipText.text = info.UpdateTip;
+        HotUpdateHandler.Instance.Dispose();
+    }
+
+    private void OnForceUpdateHandler()
+    {
+        // TODO: 强更逻辑
+    }
+
+    private void OnHotUpdateProgressHandler(HotUpdateCallbackInfo info)
+    {
+        this.m_TipText.text = "更新中...";
         this.m_RateText.text = $"{ info.CurProgress }kb/{ info.TotalProgress }kb";
         this.m_ImgProgress.fillAmount = info.CurProgress / info.TotalProgress;
+    }
+
+    private void OnNotUpdateHandler()
+    {
+        this.m_RateText.gameObject.SetActive(false);
+        this.m_TipText.text = "无需更新";
+        this.m_ImgProgress.fillAmount = 1;
+    }
+
+    private void OnHotUpdateSuccessHandler()
+    {
+        this.m_TipText.text = "更新完成";
+        this.m_ImgProgress.fillAmount = 1;
+    }
+
+    private void OnHotUpdateFailedHandler(string msg)
+    {
+        // TODO: 弹窗提示更新失败
     }
 }
