@@ -13,22 +13,7 @@ namespace FrameWork.Core.AssetsLoader
 
         private ManifestManager m_ManifestManager;
 
-        private IAssetsLoader m_AssetsLoader;
-        public IAssetsLoader AssetsLoader
-        {
-            get
-            {
-                if (this.m_AssetsLoader != null)
-                    return this.m_AssetsLoader;
-
-                if (AppConst.IsAssetBundle)
-                    this.m_AssetsLoader = new AssetBundleLoader();
-                else
-                    this.m_AssetsLoader = new EditorAssetsLoader();
-
-                return this.m_AssetsLoader;
-            }
-        }
+        public IAssetsLoader AssetsLoader { get; set; }
 
         public AssetsLoaderManager()
         {

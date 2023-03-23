@@ -1,5 +1,7 @@
 ﻿using FrameWork.Core.AssetsLoader;
+using FrameWork.Core.Bootstrap;
 using FrameWork.Core.Mixin;
+using FrameWork.Core.Modules.AssetsLoader;
 using System;
 using UnityEngine;
 using UnityEngine.U2D;
@@ -11,9 +13,12 @@ namespace FrameWork.Core.SingletonManager
     {
         private AssetsLoaderManager m_AssetsLoaderManager;
 
-        public ResourceManager()
+        public void Initialize(BootstrapMode mode)
         {
-            this.m_AssetsLoaderManager = new AssetsLoaderManager();
+            if (mode == BootstrapMode.Editor)
+                this.m_AssetsLoaderManager = new AssetsLoaderManager() { AssetsLoader = new EditorAssetsLoader() };
+            else
+                this.m_AssetsLoaderManager = new AssetsLoaderManager() { AssetsLoader = new AssetBundleLoader() };
         }
 
         public UnityObject Load(string path)

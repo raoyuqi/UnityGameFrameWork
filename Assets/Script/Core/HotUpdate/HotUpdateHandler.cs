@@ -93,9 +93,9 @@ namespace FrameWork.Core.HotUpdate
             this.m_DownloadResourceListDic = new Dictionary<string, Dictionary<string, string>>();
         }
 
-        public void StartHotUpdateProcess()
+        public IEnumerator StartHotUpdateProcessAsync()
         {
-            MonoBehaviourRuntime.Instance.StartCoroutine(this.CheckAppVersion());
+            yield return this.CheckAppVersion();
         }
 
         public IEnumerator CheckAppVersion()
