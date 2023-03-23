@@ -102,6 +102,9 @@ namespace FrameWork.Core.HotUpdate
         {
             yield return this.GetRemoteAppVersion();
 
+            if (this.IsFailed)
+                yield break;
+
             if (string.IsNullOrEmpty(this.m_RemoteAppVersion))
             {
                 // 远端没有版本文件，无需更行
@@ -154,6 +157,9 @@ namespace FrameWork.Core.HotUpdate
             // 获取需要下载的文件列表
             yield return this.GetDownloadFileList();
 
+            if (this.IsFailed)
+                yield break;
+
             if (this.m_DownloadResourceListDic.Count == 0)
                 yield break;
 
@@ -200,7 +206,7 @@ namespace FrameWork.Core.HotUpdate
 
                 if (!string.IsNullOrEmpty(www.error))
                 {
-                    Debug.LogError(www.error);
+                    this.HotUpdateCallback(HotUpdateStatus.UpdateFailed, 0, www.error);
                     yield break;
                 }
 
@@ -241,7 +247,7 @@ namespace FrameWork.Core.HotUpdate
 
                 if (!string.IsNullOrEmpty(www.error))
                 {
-                    Debug.LogError(www.error);
+                    this.HotUpdateCallback(HotUpdateStatus.UpdateFailed, 0, www.error);
                     yield break;
                 }
                 else

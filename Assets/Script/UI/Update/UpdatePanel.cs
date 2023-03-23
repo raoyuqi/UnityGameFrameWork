@@ -56,5 +56,6 @@ public class UpdatePanel : MonoBehaviour
     private void OnHotUpdateFailedHandler(string msg)
     {
         // TODO: 弹窗提示更新失败
+        Debug.LogError($"热更新失败提示: { msg }");
     }
 }
