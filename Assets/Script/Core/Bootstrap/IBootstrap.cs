@@ -8,11 +8,19 @@ namespace FrameWork.Core.Bootstrap
         Mobile
     }
 
+    public enum Status
+    {
+        Success,
+        Failed
+    }
+
     /// <summary>
     /// 启动流程
     /// </summary>
     public interface IBootstrap
     {
+        Status Status { get; }
+
         BootstrapMode BootstrapMode { get; }
 
         IEnumerator BootstrapAsync();

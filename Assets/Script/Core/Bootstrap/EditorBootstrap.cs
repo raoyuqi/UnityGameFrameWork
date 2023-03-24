@@ -7,6 +7,8 @@ namespace FrameWork.Core.Bootstrap
     {
         public BootstrapMode BootstrapMode { get => BootstrapMode.Editor; }
 
+        public Status Status { get => Status.Success; }
+
         public IEnumerator BootstrapAsync()
         {
             yield return null;

@@ -9,6 +9,17 @@ using UnityEngine;
 
 public class ApplicationManager : MonoBehaviour
 {
+    //private static ApplicationManager s_Instance;
+    //public static ApplicationManager Instance
+    //{
+    //    get
+    //    {
+    //        if (s_Instance == null)
+    //            s_Instance = FindObjectOfType<ApplicationManager>();
+    //        return s_Instance;
+    //    }
+    //}
+
     [SerializeField, LabelText("使用AssetBundle")]
     private bool IsAssetBundle;
 
@@ -38,7 +49,7 @@ public class ApplicationManager : MonoBehaviour
 
     private IBootstrap m_Bootstrap;
 
-    public event Action OnGameStarted;
+    public static event Action s_OnGameStarted;
 
     private void Awake()
     {
@@ -71,13 +82,17 @@ public class ApplicationManager : MonoBehaviour
     {
         yield return this.m_Bootstrap.BootstrapAsync();
 
+        if (this.m_Bootstrap.Status == Status.Failed)
+            yield break;
+
         yield return this.LaunchGame();
+
+        s_OnGameStarted = null;
     }
 
     private IEnumerator LaunchGame()
     {
         yield return null;
-        this.OnGameStarted?.Invoke();
-        Debug.Log("进入游戏，加载主场景");
+        s_OnGameStarted?.Invoke();
     }
 }

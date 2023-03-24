@@ -21,6 +21,8 @@ public class UpdatePanel : MonoBehaviour
         HotUpdateHandler.Instance.UpdateProgressCallback += OnHotUpdateProgressHandler;
         HotUpdateHandler.Instance.UpdateSuccessCallback += OnHotUpdateSuccessHandler;
         HotUpdateHandler.Instance.UpdateFailedCallback += OnHotUpdateFailedHandler;
+
+        ApplicationManager.s_OnGameStarted += OnGameStarted;
     }
 
     private void OnDestroy()
@@ -57,5 +59,10 @@ public class UpdatePanel : MonoBehaviour
     {
         // TODO: 弹窗提示更新失败
         Debug.LogError($"热更新失败提示: { msg }");
+    }
+
+    private void OnGameStarted()
+    {
+        Debug.Log("进入游戏，加载主场景");
     }
 }
