@@ -36,6 +36,7 @@ public class BuildAssetBundles
         var path = PathCombine(_ASSETS_DIRECTORY_ROOT, "Arts/Images");
         BuildImageAssetBundle(path, buildList);
 
+        BuildScenesAssetBundle(buildList);
         BuildPrefabAssetBundle(buildList);
 
         SpriteAtlasUtility.PackAtlases(_CREATE_ATLASES.ToArray(), EditorUserBuildSettings.activeBuildTarget);
@@ -125,6 +126,32 @@ public class BuildAssetBundles
             }
 
             BuildImageAssetBundle(dirInfo.FullName, buildList);
+        }
+    }
+
+    // 打包场景
+    private static void BuildScenesAssetBundle(List<AssetBundleBuild> buildList)
+    {
+        var path = PathCombine(_ASSETS_DIRECTORY_ROOT, "Scenes/");
+        if (!Directory.Exists(path))
+        {
+            Debug.LogError($"文件夹不存在: path = {path}");
+            return;
+        }
+
+        var dir = new DirectoryInfo(path);
+        var files = dir.GetFiles("*", SearchOption.AllDirectories);
+        foreach (var fileInfo in files)
+        {
+            if (fileInfo.Name.EndsWith(".meta"))
+                continue;
+
+            var name = PathTool.GetDirectoryRelativelyPath($"{_ASSETS_DIRECTORY_ROOT}/", fileInfo.FullName);
+            buildList.Add(new AssetBundleBuild()
+            {
+                assetBundleName = name,
+                assetNames = new string[] { PathCombine(_RELATIVE_ROOT_DIR, name) }
+            });
         }
     }
 
