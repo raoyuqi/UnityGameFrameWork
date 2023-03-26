@@ -4,7 +4,7 @@ using System.Collections;
 
 namespace FrameWork.Core.Bootstrap
 {
-    public class MobileBootstrap : IBootstrap
+    public sealed class MobileBootstrap : IBootstrap
     {
         private HotUpdateHandler m_HotUpdateHandler = HotUpdateHandler.Instance;
 

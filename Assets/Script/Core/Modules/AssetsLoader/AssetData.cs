@@ -18,6 +18,8 @@ namespace FrameWork.Core.Modules.AssetsLoader
         private int m_RefCount;
         public int RefCount { get { return this.m_RefCount; } }
 
+        public string[] ScenePaths { get; set; }
+
         public AssetData(string assetPath, UnityObject[] objects, AssetBundle assetBundle = null)
         {
             this.m_RefCount = 0;
@@ -47,6 +49,17 @@ namespace FrameWork.Core.Modules.AssetsLoader
                     list.Add(obj);
             }
             return list.ToArray() as T[];
+        }
+
+        public string[] GetAllScenePaths()
+        {
+            if (this.ScenePaths != null && this.ScenePaths.Length > 0)
+                return this.ScenePaths;
+
+            if (this.m_AssetBundle != null)
+                this.ScenePaths = this.m_AssetBundle.GetAllScenePaths();
+
+            return this.ScenePaths;
         }
 
         public void Unload(bool unloadAllLoadedObjects = true)

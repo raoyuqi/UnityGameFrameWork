@@ -149,7 +149,7 @@ public class BuildAssetBundles
             var name = PathTool.GetDirectoryRelativelyPath($"{_ASSETS_DIRECTORY_ROOT}/", fileInfo.FullName);
             buildList.Add(new AssetBundleBuild()
             {
-                assetBundleName = name,
+                assetBundleName = name.Replace("unity", "unity3d"),
                 assetNames = new string[] { PathCombine(_RELATIVE_ROOT_DIR, name) }
             });
         }

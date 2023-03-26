@@ -63,20 +63,37 @@ namespace FrameWork.Core.Modules.AssetsLoader
         //    MonoBehaviourRuntime.Instance.StartCoroutine(this.LoadAssetIEnumerator<T>(path, callback));
         //}
 
-        private IEnumerator LoadAssetIEnumerator<T>(string path, System.Action<AssetData> callback = null) where T : UnityObject
-        {
-            yield return null;
-            var assets = this.LoadAssets<T>(path);
-            if (callback != null)
-                callback(assets);
-        }
+        //private IEnumerator LoadAssetIEnumerator<T>(string path, System.Action<AssetData> callback = null) where T : UnityObject
+        //{
+        //    yield return null;
+        //    var assets = this.LoadAssets<T>(path);
+        //    if (callback != null)
+        //        callback(assets);
+        //}
 
-        public IEnumerator LoadAssetIEnumerator(string path, System.Action<AssetData> callback = null)
+        public IEnumerator LoadAssetAsync(string path, System.Action<AssetData> callback = null)
         {
             yield return null;
             var assets = this.LoadAssets(path);
             if (callback != null)
                 callback(assets);
+        }
+
+        public IEnumerator LoadSceneIAsync(string path, System.Action<AssetData> callback = null)
+        {
+            yield return null;
+
+#if UNITY_EDITOR
+            var assetsPath = Path.Combine(r_AssetsPathRoot, path);
+            var assetData = new AssetData(path, null) {
+                ScenePaths = new string[] { assetsPath }
+            };
+            if (callback != null)
+                callback(assetData);
+#else
+            if (callback != null)
+                callback(default);
+#endif
         }
     }
 }

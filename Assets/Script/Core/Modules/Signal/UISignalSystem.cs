@@ -29,7 +29,7 @@ namespace FrameWork.Core.Modules.Signal
             if (!this.m_UISignals.ContainsKey(signal))
             {
                 var signalName = Enum.GetName(typeof(UISignal), signal);
-                Debug.LogError($"UI信号未注册:{ signalName }");
+                //Debug.LogError($"UI信号未注册:{ signalName }");
                 return;
             }
 

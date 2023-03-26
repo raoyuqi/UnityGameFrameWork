@@ -1,6 +1,7 @@
 ﻿using FrameWork.Core.Attributes;
 using FrameWork.Core.Bootstrap;
 using FrameWork.Core.Modules.Pool;
+using FrameWork.Core.Service;
 using FrameWork.Core.SingletonManager;
 using Game.Config;
 using System;
@@ -47,6 +48,8 @@ public class ApplicationManager : MonoBehaviour
         }
     }
 
+    private GameServiceManager m_GameServiceManager;
+
     private IBootstrap m_Bootstrap;
 
     public static event Action s_OnGameStarted;
@@ -54,6 +57,8 @@ public class ApplicationManager : MonoBehaviour
     private void Awake()
     {
         DontDestroyOnLoad(this);
+
+        this.m_GameServiceManager = GameServiceManager.Instance;
 
         AppConst.IsAssetBundle = this.IsAssetBundle;
         AppConst.AssetCacheCount = this.AssetCacheCount;
@@ -84,6 +89,8 @@ public class ApplicationManager : MonoBehaviour
 
         if (this.m_Bootstrap.Status == Status.Failed)
             yield break;
+
+        this.m_GameServiceManager.CreateGameService<SceneService>().Initialize();
 
         yield return this.LaunchGame();
 

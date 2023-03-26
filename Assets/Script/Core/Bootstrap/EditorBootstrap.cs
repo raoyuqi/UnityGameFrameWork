@@ -3,7 +3,7 @@ using System.Collections;
 
 namespace FrameWork.Core.Bootstrap
 {
-    public class EditorBootstrap : IBootstrap
+    public sealed class EditorBootstrap : IBootstrap
     {
         public BootstrapMode BootstrapMode { get => BootstrapMode.Editor; }
 

@@ -11,6 +11,8 @@ namespace FrameWork.Core.Modules.AssetsLoader
 
         //void LoadAssetAsync<T>(string path, System.Action<AssetData> callback = null) where T : Object;
 
-        IEnumerator LoadAssetIEnumerator(string path, System.Action<AssetData> callback = null);
+        IEnumerator LoadAssetAsync(string path, System.Action<AssetData> callback = null);
+
+        IEnumerator LoadSceneIAsync(string path, System.Action<AssetData> callback = null);
     }
 }
