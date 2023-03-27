@@ -65,6 +65,17 @@ namespace FrameWork.Core.SingletonManager
             if (string.IsNullOrEmpty(scenePath))
                 yield break;
 
+            // 测试待删除
+            //for (int i = 0; i < 1000; i++)
+            //{
+            //    yield return new WaitForEndOfFrame();
+            //    if (callback != null)
+            //    {
+            //        var progress = Math.Round((float)i/1000, 2);
+            //        callback((float)progress);
+            //    }
+            //}
+
             var asyncOperation = SceneManager.LoadSceneAsync(scenePath, sceneMode);
             asyncOperation.allowSceneActivation = false;
             while (!asyncOperation.isDone)
@@ -72,7 +83,7 @@ namespace FrameWork.Core.SingletonManager
                 if (callback != null)
                 {
                     var progress = Math.Round(asyncOperation.progress, 2);
-                    callback(asyncOperation.progress);
+                    callback((float)progress);
                 }
 
                 if (Mathf.Approximately(asyncOperation.progress, 0.9f))

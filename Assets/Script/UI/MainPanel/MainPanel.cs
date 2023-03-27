@@ -10,6 +10,6 @@ public class MainPanel : UIPanelBase
 
     public override void OnOpen()
     {
-        Debug.Log("主界面已打开");
+        base.GetText("Text_Title").text = "游戏主界面";
     }
 }
