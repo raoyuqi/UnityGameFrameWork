@@ -17,6 +17,7 @@ public class LoadingPanel : UIPanelBase
     public override void OnOpen()
     {
         Debug.Log("loading界面已打开");
+        base.GetText("Text_Rate").text = "0%";
     }
 
     // TODO: 重写基类的方法
@@ -31,5 +32,8 @@ public class LoadingPanel : UIPanelBase
         base.GetText("Text_Tip").text = "场景加载中...";
         base.GetText("Text_Rate").text = $"{ progress * 100 }%";
         base.GetImage("Image_Fill").fillAmount = progress;
+
+        if (progress == 1)
+            this.gameObject.SetActive(false);
     }
 }
