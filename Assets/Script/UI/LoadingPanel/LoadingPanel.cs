@@ -1,28 +1,25 @@
-﻿using FrameWork.Core.Attributes;
+﻿using FrameWork.Core.Modules.UI;
 using FrameWork.Core.Service;
 using FrameWork.Core.SingletonManager;
 using UnityEngine;
-using UnityEngine.UI;
 
-public class LoadingPanel : MonoBehaviour
+public class LoadingPanel : UIPanelBase
 {
-    [SerializeField, LabelText("加载场景提示文本")]
-    private Text m_TipText;
-
-    [SerializeField, LabelText("加载百分比")]
-    private Text m_RateText;
-
-    [SerializeField, LabelText("加载进度条")]
-    private Image m_ImgProgress;
-
     private SceneService m_SceneService;
 
-    private void Awake()
+    public override void OnInit()
     {
+        Debug.Log("loading界面初始化");
         this.m_SceneService = GameServiceManager.Instance.GetGameService<SceneService>();
         this.m_SceneService.OnLoadSceneProgress += OnLoadSceneProgressHandler;
     }
 
+    public override void OnOpen()
+    {
+        Debug.Log("loading界面已打开");
+    }
+
+    // TODO: 重写基类的方法
     private void OnDestroy()
     {
         this.m_SceneService.Dispose();
@@ -31,8 +28,8 @@ public class LoadingPanel : MonoBehaviour
 
     private void OnLoadSceneProgressHandler(float progress)
     {
-        this.m_TipText.text = "场景加载中...";
-        this.m_RateText.text = $"{ progress * 100 }%";
-        this.m_ImgProgress.fillAmount = progress;
+        base.GetText("Text_Tip").text = "场景加载中...";
+        base.GetText("Text_Rate").text = $"{ progress * 100 }%";
+        base.GetImage("Image_Fill").fillAmount = progress;
     }
 }

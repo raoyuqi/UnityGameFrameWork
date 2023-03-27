@@ -1,6 +1,7 @@
 ﻿using FrameWork.Core.Attributes;
 using FrameWork.Core.HotUpdate;
 using FrameWork.Core.Modules.Signal;
+using FrameWork.Core.SingletonManager;
 using Game.Scene;
 using UnityEngine;
 using UnityEngine.UI;
@@ -66,7 +67,8 @@ public class UpdatePanel : MonoBehaviour
     private void OnGameStarted()
     {
         // 进入游戏，加载主场景
-        var scene = new MainScene() { Name = "Main" };
-        GlobalSignalSystem.Instance.RaiseSignal(GlobalSignal.TransScene, scene);
+        // 登录界面
+        this.gameObject.SetActive(false);
+        UIManager.Instance.OpenPanel<LoginPanel>();
     }
 }

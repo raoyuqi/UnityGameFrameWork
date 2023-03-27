@@ -4,7 +4,7 @@ using Game.Config;
 using Game.Scene;
 using System;
 using System.Collections;
-using UnityEngine.SceneManagement;
+using UnityEngine;
 
 namespace FrameWork.Core.Service
 {
@@ -19,26 +19,23 @@ namespace FrameWork.Core.Service
         {
             GlobalSignalSystem.Instance.RegisterSignal(GlobalSignal.TransScene, (args) => {
                 if (args.Length > 0)
-                {
-                    if (this.m_CurrentScene != null)
-                        this.m_CurrentScene.Exite();
-
-                    var fileSuffix = AppConst.IsAssetBundle ? "unity3d" : "unity";
-                    MonoBehaviourRuntime.Instance.StartCoroutine(ResourceManager.Instance.LoadSceneAsync($"scenes/loading.{ fileSuffix }", (progress) =>
-                    {
-                        if (progress == 1)
-                        {
-                            this.m_CurrentScene = args[0] as IGameScene;
-                            var path = $"scenes/{ this.m_CurrentScene.Name.ToLower() }.{ fileSuffix }";
-                            MonoBehaviourRuntime.Instance.StartCoroutine(this.LoadSceneAsync(path));
-                        }
-                    }, LoadSceneMode.Additive));
-                }
+                    MonoBehaviourRuntime.Instance.StartCoroutine(this.LoadSceneAsync(args[0] as IGameScene));
             });
         }
 
-        private IEnumerator LoadSceneAsync(string path)
+        private IEnumerator LoadSceneAsync(IGameScene scene)
         {
+            if (this.m_CurrentScene != null)
+                this.m_CurrentScene.Exite();
+
+            this.m_CurrentScene = scene;
+            yield return new WaitForEndOfFrame();
+
+            UIManager.Instance.OpenPanel<LoadingPanel>();
+            yield return null;
+
+            var fileSuffix = AppConst.IsAssetBundle ? "unity3d" : "unity";
+            var path = $"scenes/{ scene.Name.ToLower() }.{ fileSuffix }";
             yield return ResourceManager.Instance.LoadSceneAsync(path, (progress) =>
             {
                 this.OnLoadSceneProgress?.Invoke(progress);

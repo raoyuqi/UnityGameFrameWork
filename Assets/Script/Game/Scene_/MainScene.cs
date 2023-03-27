@@ -8,7 +8,7 @@ namespace Game.Scene
 
         public void Enter()
         {
-            UIManager.Instance.OpenPanel<LoginPanel>();
+            UIManager.Instance.OpenPanel<MainPanel>();
         }
 
         public void Exite()
