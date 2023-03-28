@@ -21,11 +21,7 @@ namespace FrameWork.Core.Modules.Signal
         public void RaiseSignal(Enum signal, params object[] args)
         {
             if (!this.m_GlobalSignalsByEnum.ContainsKey(signal))
-            {
-                var signalName = Enum.GetName(typeof(UISignal), signal);
-                Debug.LogError($"全局信号未注册:{ signalName }");
                 return;
-            }
 
             var index = 0;
             foreach (GlobalSignalHandle handle in this.m_GlobalSignalsByEnum[signal].GetInvocationList())

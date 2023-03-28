@@ -65,7 +65,7 @@ public class ApplicationManager : MonoBehaviour
         AppConst.HotUpdateUrl = this.HotUpdateUrl;
         AppConst.AppVersionFileName = this.AppVersionFileName;
         AppConst.AppResourceListFileName = this.AppResourceListFileName;
-        AppConst.UIGameObjectPool = new DefaultGameObjectPool();
+        AppConst.DefaultGameObjectPool = new DefaultGameObjectPool();
 
         if (!this.m_IsEditor)
             AppConst.IsAssetBundle = true;

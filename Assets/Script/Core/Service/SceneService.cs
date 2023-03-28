@@ -34,17 +34,31 @@ namespace FrameWork.Core.Service
             UIManager.Instance.OpenPanel<LoadingPanel>();
             yield return null;
 
+            this.m_CurrentScene.PreLoadResourceCallBack += PreLoadResourceProgress;
+            yield return this.m_CurrentScene.PreLoad();
+
             var fileSuffix = AppConst.IsAssetBundle ? "unity3d" : "unity";
             var path = $"scenes/{ scene.Name.ToLower() }.{ fileSuffix }";
             yield return ResourceManager.Instance.LoadSceneAsync(path, (progress) =>
             {
-                this.OnLoadSceneProgress?.Invoke(progress);
+                this.LoadSceneProgress(progress);
                 if (progress == 1)
                 {
                     //this.OnLoadSceneComplete?.Invoke(this.m_LoadSceneName);
+                    GlobalSignalSystem.Instance.RaiseSignal(GlobalSignal.TransFinished);
                     this.m_CurrentScene.Enter();
                 }
             });
+        }
+
+        private void PreLoadResourceProgress(float progress)
+        {
+            this.OnLoadSceneProgress?.Invoke(progress * 0.9f);
+        }
+
+        private void LoadSceneProgress(float progress)
+        {
+            this.OnLoadSceneProgress?.Invoke(0.9f + progress * 0.1f);
         }
 
         public void Dispose()

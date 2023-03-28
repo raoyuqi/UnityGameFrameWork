@@ -76,6 +76,9 @@ namespace FrameWork.Core.Modules.AssetsLoader
                 this.m_RefCount = 0;
                 Debug.LogError($"异常：资源引用计数为负数, AssetPath = {this.m_AssetPath}, RefCount = {this.m_RefCount}");
             }
+
+            //var tip = count > 0 ? "加载资源" : "卸载资源";
+            //Debug.Log($"{ tip }: path = { this.m_AssetPath }, RefCount = { this.m_RefCount } ");
         }
 
         public UnityObject LoadAsset(string name)

@@ -25,8 +25,7 @@ namespace FrameWork.Core.AssetsLoader
         {
             this.LoadDependencies(path);
 
-            var assetData = this.m_AssetDataCache[path];
-            if (assetData == null)
+            if (!this.m_AssetDataCache.TryGetValue(path, out AssetData assetData))
             {
                 // 尝试从缓存中获取
                 if (!MemoryManger.Instance.TryGetAssetData(path, out assetData))
@@ -46,8 +45,8 @@ namespace FrameWork.Core.AssetsLoader
         {
             this.LoadDependencies(path);
 
-            var assetData = this.m_AssetDataCache[path];
-            if (assetData == null)
+
+            if (!this.m_AssetDataCache.TryGetValue(path, out AssetData assetData))
             {
                 // 尝试从缓存中获取
                 if (!MemoryManger.Instance.TryGetAssetData(path, out assetData))

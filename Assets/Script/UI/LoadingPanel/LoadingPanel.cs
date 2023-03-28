@@ -1,6 +1,7 @@
 ﻿using FrameWork.Core.Modules.UI;
 using FrameWork.Core.Service;
 using FrameWork.Core.SingletonManager;
+using System;
 using UnityEngine;
 
 public class LoadingPanel : UIPanelBase
@@ -30,7 +31,7 @@ public class LoadingPanel : UIPanelBase
     private void OnLoadSceneProgressHandler(float progress)
     {
         base.GetText("Text_Tip").text = "场景加载中...";
-        base.GetText("Text_Rate").text = $"{ progress * 100 }%";
+        base.GetText("Text_Rate").text = $"{ Math.Round(progress * 100, 2) }%";
         base.GetImage("Image_Fill").fillAmount = progress;
 
         if (progress == 1)

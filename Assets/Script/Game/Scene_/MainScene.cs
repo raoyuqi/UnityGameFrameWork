@@ -2,18 +2,11 @@
 
 namespace Game.Scene
 {
-    public sealed class MainScene : IGameScene
+    public sealed class MainScene : GameSceneBase
     {
-        public string Name { get; set; }
-
-        public void Enter()
+        public override void Enter()
         {
             UIManager.Instance.OpenPanel<MainPanel>();
-        }
-
-        public void Exite()
-        {
-            
         }
     }
 }
