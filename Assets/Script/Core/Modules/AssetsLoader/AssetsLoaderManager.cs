@@ -13,22 +13,7 @@ namespace FrameWork.Core.AssetsLoader
 
         private ManifestManager m_ManifestManager;
 
-        private IAssetsLoader m_AssetsLoader;
-        public IAssetsLoader AssetsLoader
-        {
-            get
-            {
-                if (this.m_AssetsLoader != null)
-                    return this.m_AssetsLoader;
-
-                if (AppConst.IsAssetBundle)
-                    this.m_AssetsLoader = new AssetBundleLoader();
-                else
-                    this.m_AssetsLoader = new EditorAssetsLoader();
-
-                return this.m_AssetsLoader;
-            }
-        }
+        public IAssetsLoader AssetsLoader { get; set; }
 
         public AssetsLoaderManager()
         {
@@ -40,8 +25,7 @@ namespace FrameWork.Core.AssetsLoader
         {
             this.LoadDependencies(path);
 
-            var assetData = this.m_AssetDataCache[path];
-            if (assetData == null)
+            if (!this.m_AssetDataCache.TryGetValue(path, out AssetData assetData))
             {
                 // 尝试从缓存中获取
                 if (!MemoryManger.Instance.TryGetAssetData(path, out assetData))
@@ -61,8 +45,8 @@ namespace FrameWork.Core.AssetsLoader
         {
             this.LoadDependencies(path);
 
-            var assetData = this.m_AssetDataCache[path];
-            if (assetData == null)
+
+            if (!this.m_AssetDataCache.TryGetValue(path, out AssetData assetData))
             {
                 // 尝试从缓存中获取
                 if (!MemoryManger.Instance.TryGetAssetData(path, out assetData))
@@ -81,6 +65,16 @@ namespace FrameWork.Core.AssetsLoader
         public void LoadAssetAsync<T>(string path, System.Action<AssetData> callback = null) where T : UnityObject
         {
             MonoBehaviourRuntime.Instance.StartCoroutine(this.LoadAssetIEnumerator<T>(path, callback));
+        }
+
+        public void LoadAssetAsync(string path, System.Action<AssetData> callback = null)
+        {
+            MonoBehaviourRuntime.Instance.StartCoroutine(this.LoadAssetIEnumerator(path, callback));
+        }
+
+        public IEnumerator LoadSceneAsync(string path, System.Action<AssetData> callback = null)
+        {
+            yield return this.LoadAssetIEnumerator(path, callback, true);
         }
 
         public void FreeAsset(string path)
@@ -109,9 +103,9 @@ namespace FrameWork.Core.AssetsLoader
             }
         }
 
-        private IEnumerator LoadAssetIEnumerator<T>(string path, System.Action<AssetData> callback = null) where T : UnityObject
+        private IEnumerator LoadAssetIEnumerator(string path, System.Action<AssetData> callback = null, bool isScene = false)
         {
-            yield return this.LoadDependenciesIEnumerator<T>(path);
+            yield return this.LoadDependenciesIEnumerator(path);
 
             if (this.m_AssetDataCache.TryGetValue(path, out AssetData assetData))
             {
@@ -129,24 +123,41 @@ namespace FrameWork.Core.AssetsLoader
             }
             else
             {
-                yield return this.AssetsLoader.LoadAssetIEnumerator(path, (ret) => {
-                    this.m_AssetDataCache.Add(path, ret);
-                    ret.UpdateRefCount(1);
-                    if (callback != null)
-                        callback(ret);
-                });
+                if (!isScene)
+                {
+                    yield return this.AssetsLoader.LoadAssetAsync(path, (ret) => {
+                        this.m_AssetDataCache.Add(path, ret);
+                        ret.UpdateRefCount(1);
+                        if (callback != null)
+                            callback(ret);
+                    });
+                }
+                else
+                {
+                    yield return this.AssetsLoader.LoadSceneIAsync(path, (ret) => {
+                        //this.m_AssetDataCache.Add(path, ret);
+                        //ret.UpdateRefCount(1);
+                        if (callback != null)
+                            callback(ret);
+                    });
+                }
             }
 
             yield return 0;
         }
 
-        private IEnumerator LoadDependenciesIEnumerator<T>(string path) where T : UnityObject
+        private IEnumerator LoadAssetIEnumerator<T>(string path, System.Action<AssetData> callback = null) where T : UnityObject
+        {
+            yield return this.LoadAssetIEnumerator(path, callback);
+        }
+
+        private IEnumerator LoadDependenciesIEnumerator(string path)
         {
             if (AppConst.IsAssetBundle)
             {
                 var dependencies = this.m_ManifestManager.GetAssetBundleDependencies(path);
                 foreach (var bundleName in dependencies)
-                    yield return this.LoadAssetIEnumerator<T>(bundleName);
+                    yield return this.LoadAssetIEnumerator(bundleName);
             }
         }
 

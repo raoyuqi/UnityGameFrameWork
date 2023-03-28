@@ -25,6 +25,8 @@ public class UILayerManager : MonoBehaviour
 
     private void Awake()
     {
+        DontDestroyOnLoad(this);
+
         // 检查数据完整性
         if (this.m_UICameraList.Count == 0)
             throw new Exception($"UI相机数据缺失，请检查 GameObject: {this.gameObject.name} 配置");

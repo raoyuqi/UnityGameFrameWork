@@ -40,7 +40,7 @@ namespace FrameWork.Core.SingletonManager
             this.m_UISignalSystem = UISignalSystem.Instance;
             this.m_ResourceManager = ResourceManager.Instance;
             this.m_UILayerManager = GameObject.Find(UI_MANAGER_ROOT_NAME).GetComponent<UILayerManager>();
-            this.m_GameObjectPool = AppConst.UIGameObjectPool;
+            this.m_GameObjectPool = AppConst.DefaultGameObjectPool;
         }
 
         #region 管理独占UI

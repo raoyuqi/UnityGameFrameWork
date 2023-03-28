@@ -1,5 +1,8 @@
 ﻿using FrameWork.Core.Attributes;
 using FrameWork.Core.HotUpdate;
+using FrameWork.Core.Modules.Signal;
+using FrameWork.Core.SingletonManager;
+using Game.Scene;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -21,6 +24,8 @@ public class UpdatePanel : MonoBehaviour
         HotUpdateHandler.Instance.UpdateProgressCallback += OnHotUpdateProgressHandler;
         HotUpdateHandler.Instance.UpdateSuccessCallback += OnHotUpdateSuccessHandler;
         HotUpdateHandler.Instance.UpdateFailedCallback += OnHotUpdateFailedHandler;
+
+        ApplicationManager.s_OnGameStarted += OnGameStarted;
     }
 
     private void OnDestroy()
@@ -56,5 +61,14 @@ public class UpdatePanel : MonoBehaviour
     private void OnHotUpdateFailedHandler(string msg)
     {
         // TODO: 弹窗提示更新失败
+        Debug.LogError($"热更新失败提示: { msg }");
+    }
+
+    private void OnGameStarted()
+    {
+        // 进入游戏，加载主场景
+        // 登录界面
+        this.gameObject.SetActive(false);
+        UIManager.Instance.OpenPanel<LoginPanel>();
     }
 }

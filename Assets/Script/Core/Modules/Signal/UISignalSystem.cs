@@ -27,11 +27,7 @@ namespace FrameWork.Core.Modules.Signal
         public void RaiseSignal(UISignal signal, UIPanelBase UIPanel, params object[] args)
         {
             if (!this.m_UISignals.ContainsKey(signal))
-            {
-                var signalName = Enum.GetName(typeof(UISignal), signal);
-                Debug.LogError($"UI信号未注册:{ signalName }");
                 return;
-            }
 
             var index = 0;
             foreach (UISignalHandle handle in this.m_UISignals[signal].GetInvocationList())

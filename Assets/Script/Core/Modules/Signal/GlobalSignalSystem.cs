@@ -5,6 +5,12 @@ using UnityEngine;
 
 namespace FrameWork.Core.Modules.Signal
 {
+    public enum GlobalSignal
+    {
+        TransScene = 1,
+        TransFinished = 2,
+    }
+
     public delegate void GlobalSignalHandle(params object[] args);
 
     public sealed class GlobalSignalSystem : SingletonBase<GlobalSignalSystem>
@@ -12,14 +18,10 @@ namespace FrameWork.Core.Modules.Signal
         private Dictionary<Enum, GlobalSignalHandle> m_GlobalSignalsByEnum = new Dictionary<Enum, GlobalSignalHandle>();
         private Dictionary<string, GlobalSignalHandle> m_GlobalSignalsByString = new Dictionary<string, GlobalSignalHandle>();
 
-        public void RaiseSignal(UISignal signal, params object[] args)
+        public void RaiseSignal(Enum signal, params object[] args)
         {
             if (!this.m_GlobalSignalsByEnum.ContainsKey(signal))
-            {
-                var signalName = Enum.GetName(typeof(UISignal), signal);
-                Debug.LogError($"全局信号未注册:{ signalName }");
                 return;
-            }
 
             var index = 0;
             foreach (GlobalSignalHandle handle in this.m_GlobalSignalsByEnum[signal].GetInvocationList())

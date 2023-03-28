@@ -8,8 +8,8 @@ namespace Game.Config
 
         public static int AssetCacheCount;
 
-        // UI使用的对象池
-        public static IGameObjectPool UIGameObjectPool;
+        // 默认使用的对象池 TODO: 转移到模块管理里面
+        public static IGameObjectPool DefaultGameObjectPool;
 
         public static string AppVersionKey = "app_version";
 

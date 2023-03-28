@@ -62,7 +62,7 @@ namespace FrameWork.Core.SingletonManager
             }
             this.m_NoUseAssetCache.Clean();
 
-            AppConst.UIGameObjectPool.Clean();
+            AppConst.DefaultGameObjectPool.Clean();
             Resources.UnloadUnusedAssets();
             GC.Collect();
         }

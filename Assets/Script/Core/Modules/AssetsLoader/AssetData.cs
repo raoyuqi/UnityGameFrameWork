@@ -18,6 +18,8 @@ namespace FrameWork.Core.Modules.AssetsLoader
         private int m_RefCount;
         public int RefCount { get { return this.m_RefCount; } }
 
+        public string[] ScenePaths { get; set; }
+
         public AssetData(string assetPath, UnityObject[] objects, AssetBundle assetBundle = null)
         {
             this.m_RefCount = 0;
@@ -49,6 +51,17 @@ namespace FrameWork.Core.Modules.AssetsLoader
             return list.ToArray() as T[];
         }
 
+        public string[] GetAllScenePaths()
+        {
+            if (this.ScenePaths != null && this.ScenePaths.Length > 0)
+                return this.ScenePaths;
+
+            if (this.m_AssetBundle != null)
+                this.ScenePaths = this.m_AssetBundle.GetAllScenePaths();
+
+            return this.ScenePaths;
+        }
+
         public void Unload(bool unloadAllLoadedObjects = true)
         {
             if (this.m_AssetBundle != null)
@@ -63,6 +76,9 @@ namespace FrameWork.Core.Modules.AssetsLoader
                 this.m_RefCount = 0;
                 Debug.LogError($"异常：资源引用计数为负数, AssetPath = {this.m_AssetPath}, RefCount = {this.m_RefCount}");
             }
+
+            //var tip = count > 0 ? "加载资源" : "卸载资源";
+            //Debug.Log($"{ tip }: path = { this.m_AssetPath }, RefCount = { this.m_RefCount } ");
         }
 
         public UnityObject LoadAsset(string name)

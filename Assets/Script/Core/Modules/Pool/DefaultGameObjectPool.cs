@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityObject = UnityEngine.Object;
 
 namespace FrameWork.Core.Modules.Pool
 {
@@ -30,7 +31,7 @@ namespace FrameWork.Core.Modules.Pool
                     var root = new GameObject("[ObjectPool]");
                     this.m_PoolRoot = root.transform;
                     if (Application.isPlaying)
-                        UnityEngine.Object.DontDestroyOnLoad(this.m_PoolRoot);
+                        UnityObject.DontDestroyOnLoad(this.m_PoolRoot);
                 }
                 return this.m_PoolRoot;
             }
@@ -38,6 +39,18 @@ namespace FrameWork.Core.Modules.Pool
 
         // 回收利用池
         private Dictionary<string, Queue<GameObject>> m_RecyclePool = new Dictionary<string, Queue<GameObject>>();
+
+        public void CreateGameObject(GameObject prefab)
+        {
+            var poolName = prefab.name.Replace("(Clone)", "");
+            if (!this.m_RecyclePool.ContainsKey(poolName))
+                this.m_RecyclePool.Add(poolName, new Queue<GameObject>());
+
+            var gameObject = UnityObject.Instantiate(prefab);
+            gameObject.SetActive(false);
+            gameObject.transform.SetParent(this.PoolRoot);
+            this.m_RecyclePool[poolName].Enqueue(gameObject);
+        }
 
         /// <summary>
         /// 使用预制体获取一个对象
@@ -53,21 +66,24 @@ namespace FrameWork.Core.Modules.Pool
             }
 
             var poolName = prefab.name.Replace("(Clone)", "");
-            if (!this.m_RecyclePool.ContainsKey(poolName))
-                this.m_RecyclePool.Add(poolName, new Queue<GameObject>());
+            if (!this.m_RecyclePool.ContainsKey(poolName) || this.m_RecyclePool[poolName].Count == 0)
+                this.CreateGameObject(prefab);
 
-            GameObject gameObject = null;
-            var pools = this.m_RecyclePool[poolName];
-            if (pools.Count == 0)
-            {
-                gameObject = UnityEngine.Object.Instantiate(prefab);
-                gameObject.SetActive(true);
-                gameObject.transform.SetParent(this.PoolRoot);
-                return gameObject;
-            }
+            //this.m_RecyclePool.Add(poolName, new Queue<GameObject>());
+
+            //GameObject gameObject = null;
+            //var pools = this.m_RecyclePool[poolName];
+            //if (pools.Count == 0)
+            //{
+            //    gameObject = UnityObject.Instantiate(prefab);
+            //    gameObject.SetActive(true);
+            //    gameObject.transform.SetParent(this.PoolRoot);
+            //    return gameObject;
+            //}
 
             // 从对象池中取出一个物体
-            gameObject = pools.Dequeue();
+            var pools = this.m_RecyclePool[poolName];
+            var gameObject = pools.Dequeue();
             gameObject.SetActive(true);
             if (gameObject == null)
             {
@@ -115,7 +131,7 @@ namespace FrameWork.Core.Modules.Pool
             }
 
             this.Free(gameObject);
-            UnityEngine.Object.Destroy(gameObject);
+            UnityObject.Destroy(gameObject);
         }
 
         /// <summary>
@@ -129,7 +145,7 @@ namespace FrameWork.Core.Modules.Pool
                 {
                     var gameObject = item.Value.Dequeue();
                     this.Free(gameObject);
-                    UnityEngine.Object.Destroy(gameObject);
+                    UnityObject.Destroy(gameObject);
                 }
             }
             this.m_RecyclePool.Clear();
@@ -147,7 +163,7 @@ namespace FrameWork.Core.Modules.Pool
                 {
                     var gameObject = pool.Dequeue();
                     this.Free(gameObject);
-                    UnityEngine.Object.Destroy(gameObject);
+                    UnityObject.Destroy(gameObject);
                 }
             }
             this.m_RecyclePool.Remove(poolName);

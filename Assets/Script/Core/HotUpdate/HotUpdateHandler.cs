@@ -93,14 +93,17 @@ namespace FrameWork.Core.HotUpdate
             this.m_DownloadResourceListDic = new Dictionary<string, Dictionary<string, string>>();
         }
 
-        public void StartHotUpdateProcess()
+        public IEnumerator StartHotUpdateProcessAsync()
         {
-            MonoBehaviourRuntime.Instance.StartCoroutine(this.CheckAppVersion());
+            yield return this.CheckAppVersion();
         }
 
         public IEnumerator CheckAppVersion()
         {
             yield return this.GetRemoteAppVersion();
+
+            if (this.IsFailed)
+                yield break;
 
             if (string.IsNullOrEmpty(this.m_RemoteAppVersion))
             {
@@ -154,6 +157,9 @@ namespace FrameWork.Core.HotUpdate
             // 获取需要下载的文件列表
             yield return this.GetDownloadFileList();
 
+            if (this.IsFailed)
+                yield break;
+
             if (this.m_DownloadResourceListDic.Count == 0)
                 yield break;
 
@@ -200,7 +206,7 @@ namespace FrameWork.Core.HotUpdate
 
                 if (!string.IsNullOrEmpty(www.error))
                 {
-                    Debug.LogError(www.error);
+                    this.HotUpdateCallback(HotUpdateStatus.UpdateFailed, 0, www.error);
                     yield break;
                 }
 
@@ -241,7 +247,7 @@ namespace FrameWork.Core.HotUpdate
 
                 if (!string.IsNullOrEmpty(www.error))
                 {
-                    Debug.LogError(www.error);
+                    this.HotUpdateCallback(HotUpdateStatus.UpdateFailed, 0, www.error);
                     yield break;
                 }
                 else

@@ -1,6 +1,8 @@
-﻿using FrameWork.Core.Modules.UI;
+﻿using FrameWork.Core.Modules.Signal;
+using FrameWork.Core.Modules.UI;
 using FrameWork.Core.SingletonManager;
 using FrameWork.Core.Utils;
+using Game.Scene;
 using System.IO;
 using UnityEngine;
 using UnityEngine.U2D;
@@ -13,7 +15,10 @@ public class LoginPanel : UIPanelBase
         base.GetButton("Button_Login").onClick.AddListener(() =>
         {
             Debug.Log("登录游戏");
-            UIManager.Instance.OpenPanel<MainPanel>();
+            var scene = new MainScene() { Name = "Main" };
+            GlobalSignalSystem.Instance.RaiseSignal(GlobalSignal.TransScene, scene);
+
+            //UIManager.Instance.OpenPanel<MainPanel>();
         });
     }
 

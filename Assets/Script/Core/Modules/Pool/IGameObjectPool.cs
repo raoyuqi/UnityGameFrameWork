@@ -6,6 +6,9 @@ namespace FrameWork.Core.Modules.Pool
     {
         int Size { get; set; }
 
+        // 创建物体并添加到对象池
+        void CreateGameObject(GameObject prefab);
+
         // 从对象池取出物体
         GameObject GetGameObject(GameObject prefab);
 
