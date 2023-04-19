@@ -49,16 +49,16 @@ public class CharacterController_ : MonoBehaviour
 
         if (h != 0 || v != 0)
         {
-            //this.transform.Translate(0, 0, this.m_Ver * this.MoveSpeed * Time.deltaTime);
-            //this.transform.Rotate(0, this.m_Hor * this.RoteSpeed, Time.deltaTime, 0);
-
+            //this.transform.Translate(0, 0, v * this.MoveSpeed * Time.deltaTime);
+            //this.transform.Rotate(0, h * this.RoteSpeed, Time.deltaTime, 0);
+            //Debug.Log(v);
             var dir = new Vector3(h, 0, v);
             //this.m_CharacterController.Move(dir * this.MoveSpeed * Time.deltaTime);
             //this.transform.rotation = Quaternion.LookRotation(dir);
 
             this.transform.forward = dir.normalized;
             AdjustForwardDir();
-            this.m_Rigidbody.MovePosition(this.transform.position + this.transform.forward * this.MoveSpeed * Time.deltaTime);
+            this.m_Rigidbody.MovePosition(this.transform.position + this.transform.forward * this.MoveSpeed * Time.fixedDeltaTime);
         }
 
         this.AdjustGravity();
