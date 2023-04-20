@@ -13,6 +13,7 @@ namespace FrameWork.Core.SceneSeparate.Detector
 
         public abstract int GetDetectedCode(float x, float y, float z, bool ignoreY);
 
+        // 两个包围盒是否相交
         public abstract bool IsDetected(Bounds bounds);
     }
 }

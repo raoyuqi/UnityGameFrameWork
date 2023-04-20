@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace FrameWork.Core.SceneSeparate.SceneObject
+namespace FrameWork.Core.SceneSeparate.SceneObject_
 {
     /// <summary>
     /// 场景物件
     /// </summary>
-    public sealed class SceneObject : ISceneObject
+    public sealed class SceneObject : ISceneObject, ISOLinkedListNode
     {
         private ISceneObject m_TargetObj;
         public ISceneObject TargetObj

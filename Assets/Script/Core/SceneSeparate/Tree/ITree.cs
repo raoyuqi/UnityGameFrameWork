@@ -1,8 +1,10 @@
-﻿using FrameWork.Core.SceneSeparate.SceneObject;
+﻿using FrameWork.Core.SceneSeparate.SceneObject_;
 using UnityEngine;
 
 namespace FrameWork.Core.SceneSeparate.Tree
 {
+    public delegate void TriggerHandle<T>(T trigger);
+
     public interface ITree<T> where T : ISceneObject
     {
         // 根节点包围盒

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-namespace FrameWork.Core.SceneSeparate.SceneObject
+namespace FrameWork.Core.SceneSeparate.SceneObject_
 {
     /// <summary>
     /// 需要添加到场景四叉树中的物体需要实现该接口
@@ -14,6 +14,10 @@ namespace FrameWork.Core.SceneSeparate.SceneObject
         bool OnShow(Transform parent);
 
         void OnHide();
+    }
+
+    public interface ISOLinkedListNode
+    {
 
         Dictionary<uint, object> Nodes { get; }
 
