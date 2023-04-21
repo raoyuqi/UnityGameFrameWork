@@ -110,6 +110,7 @@ namespace Game.Scene
                 return true;
             }
 
+            this.m_LoadedPrefab.SetActive(true);
             return false;
         }
 

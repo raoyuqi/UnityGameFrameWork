@@ -163,8 +163,7 @@ namespace FrameWork.Core.SceneSeparate
 				data.Flag = CreateFlag.New;
 				//if (m_PreDestroyObjectList.Remove(data))
 				{
-					m_LoadedObjectLinkedList.AddFirst(data);
-
+					this.m_LoadedObjectLinkedList.AddFirst(data);
 				}
 			}
 			else if (data.Flag == CreateFlag.None)
@@ -212,7 +211,7 @@ namespace FrameWork.Core.SceneSeparate
 				return;
 			}
 
-			obj.OnShow(transform);
+			var temp = obj.OnShow(transform);
 		}
 
 		private void ProcessObjectAsyn(SceneObject obj, bool create)

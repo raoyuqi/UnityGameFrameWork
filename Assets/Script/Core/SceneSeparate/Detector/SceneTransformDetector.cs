@@ -14,7 +14,7 @@ namespace FrameWork.Core.SceneSeparate.Detector
             get { return false; }
         }
 
-        [SerializeField, LabelText("包围盒尺寸")]
+        [SerializeField]
         private Vector3 DetectorSize;
 
         private Bounds m_Bounds;

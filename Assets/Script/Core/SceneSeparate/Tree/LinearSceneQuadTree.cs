@@ -109,11 +109,11 @@ namespace FrameWork.Core.SceneSeparate.Tree
             }
             else
             {
-                if (m_MaxDepth == 0)
+                if (base.m_MaxDepth == 0)
                 {
-                    if (m_Nodes.ContainsKey(0) && m_Nodes[0] != null)
+                    if (base.m_Nodes.ContainsKey(0) && base.m_Nodes[0] != null)
                     {
-                        m_Nodes[0].Trigger(detector, handle);
+                        base.m_Nodes[0].Trigger(detector, handle);
                     }
                 }
                 else
@@ -265,9 +265,9 @@ namespace FrameWork.Core.SceneSeparate.Tree
             if (depth == m_MaxDepth)
             {
                 uint m = Morton2FromWorldPos(centerx, centerz);
-                if (m_Nodes.ContainsKey(m) && m_Nodes[m] != null)
+                if (base.m_Nodes.ContainsKey(m) && base.m_Nodes[m] != null)
                 {
-                    m_Nodes[m].Trigger(detector, handle);
+                    base.m_Nodes[m].Trigger(detector, handle);
                 }
             }
             else
