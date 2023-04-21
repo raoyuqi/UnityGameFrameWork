@@ -12,16 +12,16 @@ namespace Game.Scene
 {
     public class SceneSeparateManager : MonoBehaviour
     {
-        [SerializeField, LabelText("场景物体列表")]
-        private List<TestSceneObject> m_LoadObjects;
+        [Header("场景物体列表")]
+        public List<TestSceneObject> LoadObjects;
 
-        [SerializeField, LabelText("包围盒")]
-        private Bounds m_Bounds;
+        public Bounds Bounds;
 
         [SerializeField, LabelText("是否异步")]
         private bool m_IsAsyn;
 
-        public SceneDetectorBase Detector;
+        [SerializeField, LabelText("探测器")]
+        private SceneDetectorBase Detector;
 
         public TreeType m_TreeType = TreeType.LinearQuadTree;
 
@@ -33,12 +33,12 @@ namespace Game.Scene
             if (this.m_ObjectManager == null)
                 this.m_ObjectManager = this.gameObject.AddComponent<SceneObjectManager>();
 
-            this.m_ObjectManager.Init(this.m_Bounds.center, this.m_Bounds.size, this.m_IsAsyn, this.m_TreeType);
+            this.m_ObjectManager.Init(this.Bounds.center, this.Bounds.size, this.m_IsAsyn, this.m_TreeType);
 
 
-            for (int i = 0; i < this.m_LoadObjects.Count; i++)
+            for (int i = 0; i < this.LoadObjects.Count; i++)
             {
-                //this.m_ObjectManager.AddSceneBlockObject(this.m_LoadObjects[i]);
+                this.m_ObjectManager.AddSceneBlockObject(this.LoadObjects[i]);
             }
         }
 
@@ -50,20 +50,20 @@ namespace Game.Scene
 
         void Update()
         {
-            //this.m_ObjectManager.RefreshDetector(detector);
+            this.m_ObjectManager.RefreshDetector(this.Detector);
         }
 
         void OnDrawGizmosSelected()
         {
             if (!Application.isPlaying)
-                this.m_Bounds.DrawBounds(Color.yellow);
+                this.Bounds.DrawBounds(Color.yellow);
         }
     }
 
     [System.Serializable]
     public class TestSceneObject : ISceneObject
     {
-        [SerializeField, LabelText("包围盒")]
+        [SerializeField, Header("包围盒")]
         private Bounds m_Bounds;
 
         [SerializeField, LabelText("资源路径")]

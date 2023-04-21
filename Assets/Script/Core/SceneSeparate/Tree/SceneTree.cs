@@ -1,4 +1,5 @@
-﻿using FrameWork.Core.SceneSeparate.SceneObject_;
+﻿using FrameWork.Core.SceneSeparate.Detector;
+using FrameWork.Core.SceneSeparate.SceneObject_;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -54,6 +55,11 @@ namespace FrameWork.Core.SceneSeparate.Tree
 #endif
 
         public void Remove(T item)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public void Trigger(IDetector detector, TriggerHandle<T> handle)
         {
             throw new System.NotImplementedException();
         }

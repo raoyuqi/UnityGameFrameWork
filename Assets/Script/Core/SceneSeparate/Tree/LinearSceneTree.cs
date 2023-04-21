@@ -1,18 +1,17 @@
-﻿using UnityEngine;
-using System.Collections;
-using System.Collections.Generic;
+﻿using FrameWork.Core.SceneSeparate.Detector;
 using FrameWork.Core.SceneSeparate.SceneObject_;
-using FrameWork.Core.SceneSeparate.Detector;
+using System.Collections.Generic;
+using UnityEngine;
 
 namespace FrameWork.Core.SceneSeparate.Tree
 {
-	public abstract class LinearSceneTree<T> : ITree<T> where T : ISceneObject, ISOLinkedListNode
+    public abstract class LinearSceneTree<T> : ITree<T> where T : ISceneObject, ISOLinkedListNode
 	{
-
 		public Bounds Bounds
 		{
 			get { return m_Bounds; }
 		}
+
 		public int MaxDepth
 		{
 			get { return m_MaxDepth; }
@@ -22,29 +21,31 @@ namespace FrameWork.Core.SceneSeparate.Tree
 
 		protected Bounds m_Bounds;
 
-		protected Dictionary<uint, LinearSceneTreeLeaf<T>> m_Nodes;//使用Morton码索引的节点字典
+		//使用Morton码索引的节点字典
+		protected Dictionary<uint, LinearSceneTreeLeaf<T>> m_Nodes;
 
 		protected int m_Cols;
 
 		public LinearSceneTree(Vector3 center, Vector3 size, int maxDepth)
 		{
 			this.m_MaxDepth = maxDepth;
-			m_Bounds = new Bounds(center, size);
+			this.m_Bounds = new Bounds(center, size);
 
-			m_Cols = (int)Mathf.Pow(2, maxDepth);
-			m_Nodes = new Dictionary<uint, LinearSceneTreeLeaf<T>>();
+			this.m_Cols = (int)Mathf.Pow(2, maxDepth);
+			this.m_Nodes = new Dictionary<uint, LinearSceneTreeLeaf<T>>();
 		}
 
 		public void Clear()
 		{
-			m_Nodes.Clear();
+			this.m_Nodes.Clear();
 		}
 
 		public bool Contains(T item)
 		{
-			if (m_Nodes == null)
+			if (this.m_Nodes == null)
 				return false;
-			foreach (var node in m_Nodes)
+
+			foreach (var node in this.m_Nodes)
 			{
 				if (node.Value != null && node.Value.Contains(item))
 					return true;
@@ -58,17 +59,18 @@ namespace FrameWork.Core.SceneSeparate.Tree
 			if (item == null)
 				return;
 
-			if (m_Nodes == null)
+			if (this.m_Nodes == null)
 				return;
 
 			var nodes = item.Nodes;
 			if (nodes == null)
 				return;
+
 			foreach (var node in nodes)
 			{
-				if (m_Nodes.ContainsKey(node.Key))
+				if (this.m_Nodes.ContainsKey(node.Key))
 				{
-					var n = m_Nodes[node.Key];
+					var n = this.m_Nodes[node.Key];
 					if (n != null && n.Datas != null)
 					{
 						var value = (LinkedListNode<T>)node.Value;
@@ -92,29 +94,27 @@ namespace FrameWork.Core.SceneSeparate.Tree
 
 	public class LinearSceneTreeLeaf<T> where T : ISceneObject, ISOLinkedListNode
 	{
+		private LinkedList<T> m_DataList;
 		public LinkedList<T> Datas
 		{
 			get { return m_DataList; }
 		}
 
-		private LinkedList<T> m_DataList;
-
 		public LinearSceneTreeLeaf()
 		{
-			m_DataList = new LinkedList<T>();
+			this.m_DataList = new LinkedList<T>();
 		}
 
 		public LinkedListNode<T> Insert(T obj)
 		{
-			return m_DataList.AddFirst(obj);
+			return this.m_DataList.AddFirst(obj);
 		}
 
 		public void Trigger(IDetector detector, TriggerHandle<T> handle)
 		{
 			if (handle != null)
 			{
-				LinkedListNode<T> node = m_DataList.First;
-
+				LinkedListNode<T> node = this.m_DataList.First;
 				while (node != null)
 				{
 					if (detector.IsDetected(node.Value.Bounds))
@@ -127,15 +127,16 @@ namespace FrameWork.Core.SceneSeparate.Tree
 
 		public bool Contains(T item)
 		{
-			if (m_DataList != null && m_DataList.Contains(item))
+			if (this.m_DataList != null && this.m_DataList.Contains(item))
 				return true;
+
 			return false;
 		}
 
 #if UNITY_EDITOR
 		public bool DrawNode(Color objColor, Color hitObjColor, bool drawObj)
 		{
-			if (drawObj && m_DataList.Count > 0)
+			if (drawObj && this.m_DataList.Count > 0)
 			{
 				LinkedListNode<T> node = m_DataList.First;
 
@@ -152,7 +153,6 @@ namespace FrameWork.Core.SceneSeparate.Tree
 
 			return false;
 		}
-
 #endif
 	}
 }

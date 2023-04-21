@@ -5,10 +5,52 @@ using UnityEngine;
 namespace FrameWork.Core.SceneSeparate.SceneObject_
 {
     /// <summary>
+    /// 场景物件创建标记
+    /// </summary>
+    public enum CreateFlag
+    {
+        /// <summary>
+        /// 未创建
+        /// </summary>
+        None,
+        /// <summary>
+        /// 标记为新物体
+        /// </summary>
+        New,
+        /// <summary>
+        /// 标记为旧物体
+        /// </summary>
+        Old,
+        /// <summary>
+        /// 标记为离开视野区域
+        /// </summary>
+        OutofBounds,
+    }
+
+    /// <summary>
+    /// 场景物体加载标记
+    /// </summary>
+    public enum CreatingProcessFlag
+    {
+        None,
+        /// <summary>
+        /// 准备加载
+        /// </summary>
+        IsPrepareCreate,
+        /// <summary>
+        /// 准备销毁
+        /// </summary>
+        IsPrepareDestroy,
+    }
+
+    /// <summary>
     /// 场景物件
     /// </summary>
     public sealed class SceneObject : ISceneObject, ISOLinkedListNode
     {
+        public CreateFlag Flag { get; set; }
+        public CreatingProcessFlag ProcessFlag { get; set; }
+
         private ISceneObject m_TargetObj;
         public ISceneObject TargetObj
         {
