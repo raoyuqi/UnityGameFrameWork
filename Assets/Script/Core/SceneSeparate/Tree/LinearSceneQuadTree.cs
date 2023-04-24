@@ -118,7 +118,7 @@ namespace FrameWork.Core.SceneSeparate.Tree
                 }
                 else
                 {
-                    TriggerToNode(detector, handle, 0, m_Bounds.center.x, m_Bounds.center.z, m_Bounds.size.x, m_Bounds.size.z);
+                    TriggerToNode(detector, handle, 0, base.m_Bounds.center.x, base.m_Bounds.center.z, base.m_Bounds.size.x, base.m_Bounds.size.z);
                 }
             }
         }
@@ -151,6 +151,7 @@ namespace FrameWork.Core.SceneSeparate.Tree
                 uint m = Morton2FromWorldPos(centerx, centerz);
                 if (m_Nodes.ContainsKey(m) == false)
                     m_Nodes[m] = new LinearSceneTreeLeaf<T>();
+
                 var node = m_Nodes[m].Insert(obj);
                 obj.SetLinkedListNode<T>(m, node);
                 return true;
@@ -272,7 +273,7 @@ namespace FrameWork.Core.SceneSeparate.Tree
             }
             else
             {
-                int colider = detector.GetDetectedCode(centerx, m_Bounds.center.y, centerz, true);
+                int colider = detector.GetDetectedCode(centerx, base.m_Bounds.center.y, centerz, true);
                 float sx = sizex * 0.5f, sz = sizez * 0.5f;
 
                 if ((colider & 1) != 0)

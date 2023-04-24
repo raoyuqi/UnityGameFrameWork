@@ -4,6 +4,7 @@ using FrameWork.Core.SceneSeparate.Detector;
 using FrameWork.Core.SceneSeparate.SceneObject_;
 using FrameWork.Core.SceneSeparate.Utils;
 using FrameWork.Core.SingletonManager;
+using Game.Config;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityObject = UnityEngine.Object;
@@ -89,7 +90,8 @@ namespace Game.Scene
         {
             if (this.m_LoadedPrefab != null)
             {
-                this.m_LoadedPrefab.SetActive(false);
+                AppConst.DefaultGameObjectPool.RecycleObject(this.m_LoadedPrefab);
+                //this.m_LoadedPrefab.SetActive(false);
                 //UnityObject.Destroy(this.m_LoadedPrefab);
                 //this.m_LoadedPrefab = null;
                 //ResourceManager.UnLoad(m_ResPath);
@@ -102,16 +104,18 @@ namespace Game.Scene
             {
                 //var preLoadRes = "prefabs/nature/rock_02.prefab";
                 var prefab = ResourceManager.Instance.Load<GameObject>(this.m_ResPath);
-                this.m_LoadedPrefab = UnityObject.Instantiate(prefab);
-                this.m_LoadedPrefab.transform.SetParent(parent);
-                this.m_LoadedPrefab.transform.position = m_Position;
-                this.m_LoadedPrefab.transform.eulerAngles = m_Rotation;
-                this.m_LoadedPrefab.transform.localScale = m_Size;
-                return true;
+                this.m_LoadedPrefab = AppConst.DefaultGameObjectPool.GetGameObject(prefab);
+                //return true;
             }
 
             this.m_LoadedPrefab.SetActive(true);
-            return false;
+            this.m_LoadedPrefab.transform.SetParent(parent);
+            this.m_LoadedPrefab.transform.position = this.m_Position;
+            this.m_LoadedPrefab.transform.eulerAngles = this.m_Rotation;
+            this.m_LoadedPrefab.transform.localScale = this.m_Size;
+
+            return true;
+            //return false;
         }
 
         public TestSceneObject(Bounds bounds, Vector3 position, Vector3 rotation, Vector3 size, string resPath)

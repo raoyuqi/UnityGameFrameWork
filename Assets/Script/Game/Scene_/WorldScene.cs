@@ -10,18 +10,30 @@ namespace Game.Scene
     {
         public override IEnumerator PreLoad()
         {
-            var preLoadRes = "prefabs/nature/rock_02.prefab";
-            // 预加载100个
-            var total = 100;
-            for (int i = 0; i < total; i++)
+            // 可以改成配置
+            var preLoadResDataArray = new PreLoadResData[]
             {
-                var prefab = ResourceManager.Instance.Load<GameObject>(preLoadRes);
-                if (prefab != null)
-                    AppConst.DefaultGameObjectPool.CreateGameObject(prefab);
+                new PreLoadResData("prefabs/nature/tree_03.prefab", 10),
+                new PreLoadResData("prefabs/nature/tree_05.prefab", 10),
+            };
 
-                var progress = (float)Math.Round((float)i / total, 2);
-                base.TriggerPreLoadingEvent(progress);
-                yield return null;
+            // 预加载
+            var total = 0;
+            foreach (var preLoadResData in preLoadResDataArray)
+                total += preLoadResData.Count;
+
+            foreach (var preLoadResData in preLoadResDataArray)
+            {
+                for (int i = 0; i < preLoadResData.Count; i++)
+                {
+                    var prefab = ResourceManager.Instance.Load<GameObject>(preLoadResData.Path);
+                    if (prefab != null)
+                        AppConst.DefaultGameObjectPool.CreateGameObject(prefab);
+
+                    var progress = (float)Math.Round((float)i / total, 2);
+                    base.TriggerPreLoadingEvent(progress);
+                    yield return null;
+                }
             }
         }
 

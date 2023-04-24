@@ -211,7 +211,7 @@ namespace FrameWork.Core.SceneSeparate
 				return;
 			}
 
-			var temp = obj.OnShow(transform);
+			obj.OnShow(this.transform);
 		}
 
 		private void ProcessObjectAsyn(SceneObject obj, bool create)

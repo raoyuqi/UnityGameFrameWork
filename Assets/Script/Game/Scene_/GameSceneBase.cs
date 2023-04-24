@@ -5,6 +5,18 @@ using System.Collections;
 
 namespace Game.Scene
 {
+    public struct PreLoadResData
+    {
+        public string Path;
+        public ushort Count;
+
+        public PreLoadResData(string path, ushort count)
+        {
+            this.Path = path;
+            this.Count = count;
+        }
+    }
+
     public abstract class GameSceneBase : IGameScene
     {
         public string Name { get; set; }
