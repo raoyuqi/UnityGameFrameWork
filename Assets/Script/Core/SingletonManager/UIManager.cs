@@ -21,14 +21,20 @@ namespace FrameWork.Core.SingletonManager
         //private Stack<UIPanelBase> m_HideUIStack = new Stack<UIPanelBase>();
 
         // 打开的独占界面和它的子弹窗
-        private Dictionary<string, List<UIPanelBase>> m_ExclusiveUIPopups = new Dictionary<string, List<UIPanelBase>>();
+        //private Dictionary<string, List<UIPanelBase>> m_ExclusiveUIPopups = new Dictionary<string, List<UIPanelBase>>();
 
         // TODO: 从其它界面跳回主界面需要清空栈中数据,实现一个跳回主界面的方法
         // 隐藏的独占UI
-        private Stack<UIPanelBase> m_HideExclusiveUIStack = new Stack<UIPanelBase>();
+        //private Stack<UIPanelBase> m_HideExclusiveUIStack = new Stack<UIPanelBase>();
 
         // 显示的独占UI
-        private Stack<UIPanelBase> m_ShowExclusiveUIStack = new Stack<UIPanelBase>();
+        //private Stack<UIPanelBase> m_ShowExclusiveUIStack = new Stack<UIPanelBase>();
+
+        // 显示的UI
+        private Stack<UIPanelBase> m_ShowUIStack = new Stack<UIPanelBase>();
+
+        // 隐藏待恢复的UI
+        private Stack<UIPanelBase> m_RecoverUIStack = new Stack<UIPanelBase>();
 
         private IGameObjectPool m_GameObjectPool;
         private UISignalSystem m_UISignalSystem;
@@ -84,7 +90,8 @@ namespace FrameWork.Core.SingletonManager
                 panel.OnOpen();
 
                 this.OpenPanelHandle(panel, panelName);
-                this.m_ShowExclusiveUIStack.Push(panel);
+                //this.m_ShowExclusiveUIStack.Push(panel);
+                this.m_ShowUIStack.Push(panel);
 
                 this.m_UISignalSystem.RaiseSignal(UISignal.OnOpened, panel);
             });
@@ -107,6 +114,14 @@ namespace FrameWork.Core.SingletonManager
         {
             if (this.m_UIPanelDic.TryGetValue(panelName, out UIPanelBase panel))
             {
+                var item = this.m_ShowUIStack.Peek();
+                if (panel != item)
+                {
+                    Debug.LogError($"要关闭的界面与栈顶界面不一致：panelName = { panelName }");
+                    return;
+                }
+
+                this.m_ShowUIStack.Pop();
                 var go = panel.gameObject;
                 go.SetActive(false);
                 panel.OnHide();
@@ -125,22 +140,32 @@ namespace FrameWork.Core.SingletonManager
             if (panel.UIShowType != UIShowType.Exclusive)
                 return;
 
-            while (this.m_ShowExclusiveUIStack.Count > 0)
+            while (this.m_ShowUIStack.Count > 0)
             {
-                var exclusivePanel = this.m_ShowExclusiveUIStack.Pop();
-                exclusivePanel.gameObject.SetActive(false);
-                exclusivePanel.OnHide();
-                this.m_HideExclusiveUIStack.Push(exclusivePanel);
+                var item = this.m_ShowUIStack.Pop();
+                item.gameObject.SetActive(false);
+                item.OnHide();
 
-                if (this.m_ExclusiveUIPopups.TryGetValue(panelName, out List<UIPanelBase> popups))
-                {
-                    foreach (var popup in popups)
-                    {
-                        popup.gameObject.SetActive(false);
-                        popup.OnHide();
-                    } 
-                }
+                this.m_RecoverUIStack.Push(item);
             }
+
+            //while (this.m_ShowExclusiveUIStack.Count > 0)
+            //{
+            //    var exclusivePanel = this.m_ShowExclusiveUIStack.Pop();
+            //    exclusivePanel.gameObject.SetActive(false);
+            //    exclusivePanel.OnHide();
+            //    //this.m_HideExclusiveUIStack.Push(exclusivePanel);
+            //    this.m_HideUIStack.Push(exclusivePanel);
+
+            //    if (this.m_ExclusiveUIPopups.TryGetValue(panelName, out List<UIPanelBase> popups))
+            //    {
+            //        foreach (var popup in popups)
+            //        {
+            //            popup.gameObject.SetActive(false);
+            //            popup.OnHide();
+            //        } 
+            //    }
+            //}
         }
 
         /// <summary>
@@ -153,22 +178,41 @@ namespace FrameWork.Core.SingletonManager
             if (panel.UIShowType != UIShowType.Exclusive)
                 return;
 
-            if (this.m_HideExclusiveUIStack.Count > 0)
+            var count = 0;
+            while (this.m_RecoverUIStack.Count > 0)
             {
-                var exclusivePanel = this.m_HideExclusiveUIStack.Pop();
-                exclusivePanel.gameObject.SetActive(true);
-                exclusivePanel.OnOpen();
-                this.m_ShowExclusiveUIStack.Push(exclusivePanel);
+                var item = this.m_RecoverUIStack.Peek();
+                if (item.UIShowType == UIShowType.Exclusive)
+                    count++;
 
-                if (this.m_ExclusiveUIPopups.TryGetValue(panelName, out List<UIPanelBase> popups))
-                {
-                    foreach (var popup in popups)
-                    {
-                        popup.gameObject.SetActive(true);
-                        popup.OnOpen();
-                    }
-                }
+                // 两次遇到独占则退出，恢复一个独占页面状态即可
+                if (count > 1)
+                    break;
+
+                item = this.m_RecoverUIStack.Pop();
+                item.gameObject.SetActive(true);
+                item.OnOpen();
+
+                this.m_ShowUIStack.Push(item);
             }
+
+            //if (this.m_HideExclusiveUIStack.Count > 0)
+            //{
+            //    var exclusivePanel = this.m_HideExclusiveUIStack.Pop();
+            //    exclusivePanel.gameObject.SetActive(true);
+            //    exclusivePanel.OnOpen();
+            //    //this.m_ShowExclusiveUIStack.Push(exclusivePanel);
+            //    this.m_ShowUIStack.Push(exclusivePanel);
+
+            //    if (this.m_ExclusiveUIPopups.TryGetValue(panelName, out List<UIPanelBase> popups))
+            //    {
+            //        foreach (var popup in popups)
+            //        {
+            //            popup.gameObject.SetActive(true);
+            //            popup.OnOpen();
+            //        }
+            //    }
+            //}
         }
         #endregion
 
@@ -235,11 +279,21 @@ namespace FrameWork.Core.SingletonManager
         {
             if (this.m_UIPanelDic.TryGetValue(popupName, out UIPanelBase popup))
             {
+                var itme = this.m_ShowUIStack.Peek();
+                if (itme != popup)
+                {
+                    Debug.LogError($"要关闭的界面与栈顶界面不一致：panelName = { panelName }");
+                    return;
+                }
+
+                this.m_ShowUIStack.Pop();
                 popup.gameObject.SetActive(false);
                 popup.OnHide();
-                this.ClosePopupHandle(popup, panelName);
                 this.m_UISignalSystem.RaiseSignal(UISignal.OnClosed, popup);
-                return;
+
+                //popup.gameObject.SetActive(false);
+                //popup.OnHide();
+                //this.ClosePopupHandle(popup, panelName);
             }
         }
 
@@ -253,10 +307,11 @@ namespace FrameWork.Core.SingletonManager
             if (popup.UIShowType != UIShowType.Popup)
                 return;
 
-            if (!this.m_ExclusiveUIPopups.ContainsKey(panelName))
-                this.m_ExclusiveUIPopups.Add(panelName, new List<UIPanelBase>());
+            //if (!this.m_ExclusiveUIPopups.ContainsKey(panelName))
+            //    this.m_ExclusiveUIPopups.Add(panelName, new List<UIPanelBase>());
 
-            this.m_ExclusiveUIPopups[panelName].Add(popup);
+            //this.m_ExclusiveUIPopups[panelName].Add(popup);
+            this.m_ShowUIStack.Push(popup);
         }
 
         /// <summary>
@@ -269,11 +324,11 @@ namespace FrameWork.Core.SingletonManager
             if (popup.UIShowType != UIShowType.Popup)
                 return;
 
-            if (this.m_ExclusiveUIPopups.TryGetValue(panelName, out List<UIPanelBase> popups))
-            {
-                if (popups.Count > 0)
-                    popups.Remove(popup);
-            }
+            //if (this.m_ExclusiveUIPopups.TryGetValue(panelName, out List<UIPanelBase> popups))
+            //{
+            //    if (popups.Count > 0)
+            //        popups.Remove(popup);
+            //}
         }
         #endregion
 
@@ -281,9 +336,11 @@ namespace FrameWork.Core.SingletonManager
         {
             // TODO: 跳转到主界面
 
-            this.m_ExclusiveUIPopups.Clear();
-            this.m_HideExclusiveUIStack.Clear();
-            this.m_ShowExclusiveUIStack.Clear();
+            //this.m_ExclusiveUIPopups.Clear();
+            //this.m_HideExclusiveUIStack.Clear();
+            this.m_ShowUIStack.Clear();
+            //this.m_ShowExclusiveUIStack.Clear();
+            this.m_RecoverUIStack.Clear();
             // 打开的主界面入栈
             //this.m_ShowExclusiveUIStack.Push();
         }
@@ -295,10 +352,13 @@ namespace FrameWork.Core.SingletonManager
                 var go = item.Value.gameObject;
                 this.m_GameObjectPool.RecycleObject(go);
             }
+
             this.m_UIPanelDic.Clear();
-            this.m_ExclusiveUIPopups.Clear();
-            this.m_HideExclusiveUIStack.Clear();
-            this.m_ShowExclusiveUIStack.Clear();
+            //this.m_ExclusiveUIPopups.Clear();
+            //this.m_HideExclusiveUIStack.Clear();
+            this.m_ShowUIStack.Clear();
+            //this.m_ShowExclusiveUIStack.Clear();
+            this.m_RecoverUIStack.Clear();
         }
 
         private UIPanelBase CreateUIPanel(GameObject prefab, string uiName)
