@@ -69,6 +69,7 @@ namespace Game.Scene
 
         [SerializeField, LabelText("资源路径")]
         private string m_ResPath;
+        public string ResPath { get { return this.m_ResPath; } }
 
         [SerializeField, LabelText("物体坐标")]
         private Vector3 m_Position;
@@ -91,6 +92,7 @@ namespace Game.Scene
             if (this.m_LoadedPrefab != null)
             {
                 AppConst.DefaultGameObjectPool.RecycleObject(this.m_LoadedPrefab);
+                this.m_LoadedPrefab = null;
                 //this.m_LoadedPrefab.SetActive(false);
                 //UnityObject.Destroy(this.m_LoadedPrefab);
                 //this.m_LoadedPrefab = null;

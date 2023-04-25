@@ -1,6 +1,7 @@
 ﻿using FrameWork.Core.SceneSeparate.Detector;
 using FrameWork.Core.SceneSeparate.SceneObject_;
 using FrameWork.Core.SceneSeparate.Utils;
+using Game.Scene;
 using UnityEngine;
 
 
@@ -267,9 +268,7 @@ namespace FrameWork.Core.SceneSeparate.Tree
             {
                 uint m = Morton2FromWorldPos(centerx, centerz);
                 if (base.m_Nodes.ContainsKey(m) && base.m_Nodes[m] != null)
-                {
                     base.m_Nodes[m].Trigger(detector, handle);
-                }
             }
             else
             {
