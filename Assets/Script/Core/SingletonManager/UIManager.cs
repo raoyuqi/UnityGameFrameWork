@@ -3,6 +3,7 @@ using FrameWork.Core.Modules.Pool;
 using FrameWork.Core.Modules.Signal;
 using FrameWork.Core.Modules.UI;
 using Game.Config;
+using Game.UI;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -365,6 +366,9 @@ namespace FrameWork.Core.SingletonManager
         {
             // 从缓存池获取GameObject
             var go = this.m_GameObjectPool.GetGameObject(prefab);
+            if (go.GetComponent<CanvasAdapter>() == null)
+                go.AddComponent<CanvasAdapter>();
+
             var panel = go.GetComponent<UIPanelBase>();
 
             panel.OnInit();
