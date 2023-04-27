@@ -28,9 +28,14 @@ namespace Game.UI
             ApplicationManager.s_OnScreenResolutionChangedEvent += OnScreenResolutionChangedEvent;
         }
 
-        void Start()
+        private void Start()
         {
             this.ApplyRectRootAdaption();
+        }
+
+        private void OnDestroy()
+        {
+            ApplicationManager.s_OnScreenResolutionChangedEvent -= OnScreenResolutionChangedEvent;
         }
 
         private void OnScreenResolutionChangedEvent(int width, int height)
