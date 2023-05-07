@@ -3,6 +3,7 @@ using FrameWork.Core.Bootstrap;
 using FrameWork.Core.Modules.Pool;
 using FrameWork.Core.Service;
 using FrameWork.Core.SingletonManager;
+using FrameWork.Core.Utils;
 using Game.Config;
 using System;
 using System.Collections;
@@ -36,6 +37,9 @@ public class ApplicationManager : MonoBehaviour
     [SerializeField, LabelText("资源清单文件名")]
     private string AppResourceListFileName;
 
+    private int m_ScreenWidth;
+    private int m_ScreenHeight;
+
     private bool m_IsEditor
     {
         get
@@ -53,6 +57,8 @@ public class ApplicationManager : MonoBehaviour
     private IBootstrap m_Bootstrap;
 
     public static event Action s_OnGameStarted;
+
+    public static event Action<int, int> s_OnScreenResolutionChangedEvent;
 
     private void Awake()
     {
@@ -76,11 +82,28 @@ public class ApplicationManager : MonoBehaviour
             this.m_Bootstrap = new MobileBootstrap();
         else
             this.m_Bootstrap = new EditorBootstrap();
+
+        GameUtils.GetScreenDimensions(out var width, out var height);
+        this.m_ScreenWidth = width;
+        this.m_ScreenHeight = height;
     }
 
     private void Start()
     {
         this.StartCoroutine(this.Bootstrap());
+    }
+
+    private void Update()
+    {
+        GameUtils.GetScreenDimensions(out var width, out var height);
+
+        if (this.m_ScreenWidth != width || this.m_ScreenHeight != height)
+        {
+            this.m_ScreenWidth = width;
+            this.m_ScreenHeight = height;
+            Debug.Log($"screen resolution changed: ({width}x{height})");
+            s_OnScreenResolutionChangedEvent?.Invoke(width, height);
+        }
     }
 
     private IEnumerator Bootstrap()
