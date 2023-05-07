@@ -65,7 +65,7 @@ namespace FrameWork.Core.Modules.UI
             get { return this.m_UILayerType; }
         }
 
-        private List<UIPanelBase> m_PopupList = new List<UIPanelBase>(); 
+        //private List<UIPanelBase> m_PopupList = new List<UIPanelBase>();
 
         // 缓存界面使用到的控件
         private Dictionary<string, Text> m_TextCache = new Dictionary<string, Text>();

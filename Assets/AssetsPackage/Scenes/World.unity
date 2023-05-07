@@ -4149,7 +4149,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: de3c8595f11fbe6428d5488ae3174d64, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  DetectorSize: {x: 20, y: 2, z: 20}
+  DetectorSize: {x: 30, y: 2, z: 30}
 --- !u!54 &2015645693
 Rigidbody:
   m_ObjectHideFlags: 0
